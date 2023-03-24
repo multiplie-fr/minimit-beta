@@ -16,6 +16,7 @@ void wifiConnect() {
   Serial.println("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     delay(2000);
+    Serial.println("");
     Serial.println(WiFi.status());
   }
   Serial.print("Connected to WiFi network with IP Address: ");
@@ -27,14 +28,48 @@ void wifiConnect() {
 void afficheRemoteVDT(String vdtFile, int offsetY, int offsetX) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    String serverPath = serverName + String("vdt.php?f=") + vdtFile;
+    String serverPath = serverName + String("vdt2.php?f=") + vdtFile;
     Serial.println(serverPath);
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
-      String payload = http.getString();
-      drawScreen(payload, offsetY, offsetX);
+       String payload = http.getString();
+      //Serial.print(payload);
+      //drawScreen(payload, offsetY, offsetX);
+      checkScreen(payload, offsetY,offsetX);
     }
+  }
+}
+void checkScreen(String s, int offsetY, int offsetX){
+  unsigned int str_len = s.length() + 2;
+  int i = 0;
+  int positionnement = 0;
+  int startpositionnement = -1;
+  int cnt = 0;
+  for (i=0; i<str_len; i+=3)
+  {
+    String myByte = "0x" + s.substring(i,i+2);
+    int val = strtoul(myByte.c_str(), NULL, 16);
+    if (positionnement == 1) {
+
+      if (i == startpositionnement + 3) {
+        val += offsetY;
+      }
+      if (i == startpositionnement + 6) {
+        val += offsetX;
+      }
+    }
+    if (i > startpositionnement + 3) {
+      positionnement = 0;
+    }
+    minitel.writeByte(val);
+
+     if (val == 31) {
+      positionnement = 1;
+      startpositionnement = i;
+    }
+    
+   
   }
 }
 void drawScreen(String s, int offsetY, int offsetX) {
@@ -74,14 +109,21 @@ void drawScreen(String s, int offsetY, int offsetX) {
   }
 }
 
-void effacementEcran(int y1, int y2) {
+void effacementEcran(int y1, int y2, int attribut1, int attribut2) {
   minitel.noCursor();
   minitel.attributs(FIN_LIGNAGE);
-  //minitel.attributs(FOND_BLEU);
-  //minitel.attributs(CARACTERE_BLEU);
+  minitel.attributs(attribut1);
+  //minitel.attributs(INVERSION_FOND);
+  minitel.attributs(attribut2);
   for (int i = 0; i <= (y2 - y1); i++) {
     minitel.moveCursorXY(1, (y2 - i));
-    minitel.clearLine();
+    minitel.graphicMode();
+    //minitel.writeByte(0x20);
+    minitel.graphic(0b111100);
+    minitel.repeat(39);
+    //minitel.clearLine();
   }
-  minitel.cursor();
+  //minitel.cursor();
+  //minitel.attributs(FOND_NORMAL);
+  minitel.textMode();
 }
