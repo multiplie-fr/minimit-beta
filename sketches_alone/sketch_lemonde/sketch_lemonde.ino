@@ -6,15 +6,16 @@
 Minitel minitel(Serial1);    // Le deuxième port série matériel de l'ATMega 1284P (RXD1 TXD1).
 
 
-typedef unsigned char PROGMEM prog_uchar;
-const char* ssid = "Livebox-Xine";
-const char* password = "malakoff";
+// const char* ssid = "Livebox-Xine";
+// const char* password = "malakoff";
 //const char* ssid = "SFR_81F0";
 //const char* password = "dogmysodsedcebjiags4";
 //const char* ssid = "iPhone";
 //const char* password = "tttttttt";
 //const char* ssid = "LaVillamour";
 //const char* password = "lavlina12";
+const char* ssid = "Dogtown";
+const char* password = "west100-;";
 const char* serverName = "https://xn--multipli-i1a.fr/minimit/prod/";
 
 ///
@@ -29,34 +30,75 @@ unsigned long touche;
 String chaine;
 
 void setup() {
-
   Serial.begin(115200);
-  Serial.println("");
   minitel.pageMode();
   minitel.newScreen();
-  Serial.println("BBB");
+  minitel.textMode();
   wifiConnect();
-  Serial.println("CCC");
-  //populate les params
+  initLEMONDE();
+  afficheUNELEMONDE();
+}
+
+void initLEMONDE(){
+  minitel.newScreen();
+  
   myObject["currentPage"] = (int)0;
   myObject["displayMode"] = (int)1;
   //Displaymode
   //1 : liste
   //2 : fiche
-  ///
-
-  //ON affiche le fond d'écran
-  afficheRemoteVDT("bandeaulemonde.vdt", 0, 0);
-  minitel.textMode();
-  displayNavList();
-  retrieveDatas("lemonde/getjson.php?current=", 1, 1);
+  myObject["format"] = "UNE";
+  ///UNE ou BRE
+  displayBandeau();
+  
 }
-void displayNavArticle(int previousDisplayMode){
-if(previousDisplayMode==1){
-    minitel.moveCursorXY(1,24);
+void resetPagesLEMONDE(){
+  myObject["currentPage"] = (int)0;
+  myObject["displayMode"] = (int)1;
+}
+void afficheUNELEMONDE(){
+  myObject["format"] = "UNE";
+  updateBandeauLEMONDE("UNE");
+  displayNavList();
+  retrieveDatasLEMONDE("lemonde/getjson.php?current=", 1, 1);
+  afficheDatasLEMONDE();
+}
+void afficheBRELEMONDE(){
+  myObject["format"] = "BRE";
+  minitel.newScreen();
+  displayBandeau();
+  updateBandeauLEMONDE("BRE");
+  displayNavList();
+  retrieveDatasLEMONDE("lemonde/getjson.php?mode=liste&format=bre", 1, 0);
+  afficheDatasLEMONDE();
+}
+
+void repetitionLEMONDE(){
+  JSONVar format = myObject["format"];
+  String sformat = (const char*)format; 
+  int displayMode = myObject["displayMode"];
+  if(sformat=="UNE"){
+    if (displayMode==1){
+      afficheUNELEMONDE();      
+    }
+  }
+}
+void sommaireLEMONDE(){
+  initLEMONDE();
+  afficheUNELEMONDE();
+}           
+void displayBandeau() {
+  String vdt = "14,0c,1f,41,41,0e,1b,54,20,38,24,20,2c,38,38,30,20,12,43,28,30,20,12,59,1f,42,41,0e,1b,54,20,1b,57,1b,44,4a,1b,54,1b,47,48,1b,57,1b,44,46,1b,54,20,1b,57,4a,12,42,49,1b,54,1b,47,34,1b,57,1b,44,48,1b,54,1b,47,34,1b,57,1b,44,49,4a,29,1b,54,1b,47,24,20,12,57,1f,43,41,0e,1b,54,40,45,2a,38,40,25,1b,57,1b,44,4a,1b,54,1b,47,45,45,25,25,1b,57,1b,44,4a,1b,54,1b,47,45,25,45,24,20,12,57,1f,44,41,0e,1b,44,23,12";
+  checkScreen(vdt, 0, 0);
+  minitel.textMode();
+  
+}
+void displayNavArticle(int previousDisplayMode) {
+  if (previousDisplayMode == 1) {
+    minitel.moveCursorXY(1, 24);
     minitel.print(" ");
     minitel.repeat(22);
-    minitel.moveCursorXY(1,24);
+    minitel.moveCursorXY(1, 24);
     minitel.attributs(CARACTERE_MAGENTA);
     minitel.print("Revenir au ");
     minitel.attributs(INVERSION_FOND);
@@ -64,7 +106,9 @@ if(previousDisplayMode==1){
     minitel.attributs(FOND_NORMAL);
   }
 }
-void displayNavList(){
+void displayNavList() {
+  JSONVar format = myObject["format"];
+  String sformat = (const char*)format;
   effacementEcran(23, 24);
   minitel.attributs(CARACTERE_BLEU);
   minitel.moveCursorXY(0, 22);
@@ -81,13 +125,26 @@ void displayNavList(){
   minitel.attributs(FOND_NORMAL);
   minitel.moveCursorXY(2, 24);
   minitel.attributs(CARACTERE_MAGENTA);
-  minitel.print("Les brèves ");
+  if (sformat=="UNE")
+  {
+    minitel.print("Les brèves ");
+    minitel.attributs(CARACTERE_BLANC);
+    minitel.print("BRE");
+    minitel.attributs(DEBUT_LIGNAGE);
+    minitel.writeByte(0x20);
+    minitel.attributs(INVERSION_FOND);
+    minitel.attributs(CARACTERE_BLANC);    
+  }
+  else {
+  minitel.print("  A la Une ");
   minitel.attributs(CARACTERE_BLANC);
-  minitel.print("BRE");
+  minitel.print("UNE");
   minitel.attributs(DEBUT_LIGNAGE);
   minitel.writeByte(0x20);
   minitel.attributs(INVERSION_FOND);
   minitel.attributs(CARACTERE_BLANC);
+  }
+ 
   minitel.print(" ENVOI ");
   minitel.attributs(FOND_NORMAL);
 
@@ -99,7 +156,13 @@ void displayNavList(){
   minitel.print(" RETOUR");
   minitel.writeByte(0x7C);
   minitel.print("SUITE ");
-  minitel.attributs(FOND_NORMAL);  
+  minitel.attributs(FOND_NORMAL);
+}
+boolean isValidNumber(String str) {
+  for (byte i = 0; i < str.length(); i++) {
+    if (isDigit(str.charAt(i))) return true;
+  }
+  return false;
 }
 void lectureChamp(int x, int y, int longueurchamp) {
   Serial.print("lc");
@@ -120,17 +183,23 @@ void lectureChamp(int x, int y, int longueurchamp) {
     }
     switch (touche) {
       case SUITE:
-        Serial.println("suite");
-        // if ((int)myObject["currentPage"] == 0) {
-        //   break;
-        // }
-        Serial.print(myObject["nbPages"]);
-        Serial.println(myObject["currentPage"]);
-        myObject["currentPage"] = (int)(myObject["currentPage"]) + 1;
-        Serial.println(myObject);
-        effacementEcran(5, 21);
-        fin = true;
-        afficheListe(myObject["currentPage"]);
+        {
+          Serial.println("suite");
+          int currentPage = myObject["currentPage"];
+          int nbPages = myObject["nbPages"];
+          if (currentPage == nbPages - 1) {
+            break;
+          }
+          Serial.println("nbpages");
+          Serial.println(myObject["nbPages"]);
+          Serial.println("currentpage");
+          Serial.println(myObject["currentPage"]);
+          myObject["currentPage"] = (int)(myObject["currentPage"]) + 1;
+          Serial.println(myObject);
+          effacementEcran(5, 21);
+          fin = true;
+          afficheListe(myObject["currentPage"]);
+        }
         break;
       case RETOUR:
         if ((int)myObject["currentPage"] == 0) {
@@ -144,21 +213,37 @@ void lectureChamp(int x, int y, int longueurchamp) {
       case ENVOI:
         fin = true;
         Serial.println("envoi");
+        userInput.toUpperCase();
         if (userInputNeeded > 0) {
           Serial.println("choix");
           Serial.println(userInput);
-          int userInputInt = userInput.toInt();
-          userInputInt--;
-          //retrieveDatas();
-          retrieveDatas("lemonde/getjson.php?mode=article&item=" + String(userInputInt), 2, userInputInt);
+          if(!isValidNumber(userInput)){
+            if (userInput == "BRE") {
+             afficheBRELEMONDE();
+            }
+            if (userInput == "UNE") {
+              myObject["format"] = "UNE";
+              updateBandeauLEMONDE("UNE");
+              myObject["currentPage"] = (int)0;
+              myObject["displayMode"] = (int)1;
+              retrieveDatasLEMONDE("lemonde/getjson.php?mode=liste&format=une", 1, 0);
+              effacementEcran(5, 21);
+              afficheDatasLEMONDE();
+            }
+          }
+          
+          else {
+            int userInputInt = userInput.toInt();
+            userInputInt--;
+            retrieveDatasLEMONDE("lemonde/getjson.php?mode=article&item=" + String(userInputInt), 2, userInputInt);
+            afficheDatasLEMONDE();
+          }
         }
         break;
       case SOMMAIRE:
-        fin=true;
-        effacementEcran(5, 21);
-        displayNavList();
-        afficheListe(myObject["currentPage"]);
-      break;
+        fin = true;
+        sommaireLEMONDE();
+        break;
       case ANNULATION:
         champVide(x, y, longueurchamp);
         break;
@@ -173,18 +258,64 @@ void loop() {
   lectureChamp(13, 23, 3);
   //userInput = "";
 }
+void updateBandeauLEMONDE(String format) {
+  if (format == "BRE") {
+    minitel.moveCursorXY(18, 2);
+    minitel.attributs(CARACTERE_CYAN);
+    minitel.print("EN ");
+    minitel.attributs(CARACTERE_BLANC);
+    minitel.print("BRE");
+    minitel.attributs(CARACTERE_CYAN);
+    minitel.print("F CE JOUR");
+  }
+  if (format == "UNE") {
+    minitel.moveCursorXY(18, 2);
+    minitel.attributs(CARACTERE_CYAN);
+    minitel.print("A LA ");
+    minitel.attributs(CARACTERE_BLANC);
+    minitel.print("UNE ");
+    minitel.attributs(CARACTERE_CYAN);
+    minitel.print("CE JOUR");
+  }
+}
+void afficheDatasLEMONDE() {
+  int displayMode = myObject["displayMode"];
+  int currentPage = myObject["currentPage"];
+  switch (displayMode) {
+    case 1:
+      {
+        //affiche date en haut
+        JSONVar date = myObject["myDatas"]["root"]["date"];
+        JSONVar myarrayPagesOffset = myObject["myDatas"]["root"]["pages"];
+        int nbPagesOfList = myarrayPagesOffset.length() - 1;
+        myObject["nbPages"] = nbPagesOfList;
 
+        minitel.moveCursorXY(18, 3);
+        minitel.attributs(CARACTERE_BLANC);
+        minitel.print((const char*)date);
+        afficheListe(currentPage);
+      }
+      break;
 
+    case 2:
+      {
+        myObject["myArticle"] =  myObject["myDatas"];
+        myObject["currentPageFolio"] = 0;
+        int previousDisplayMode = myObject["previousDisplayMode"];
+        affichePage(previousDisplayMode);
+        break;
+      }
+  }
+}
 
-void retrieveDatas(String phpFile, int displayMode, int articleItem) {
+void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
   int previousDisplayMode = myObject["displayMode"];
+  myObject["previousDisplayMode"] = previousDisplayMode;
   myObject["displayMode"] = displayMode;
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath;
     int currentPage = myObject["currentPage"];
-    
-        
     switch (displayMode) {
       case 1:
         serverPath = serverName + String(phpFile);
@@ -205,43 +336,12 @@ void retrieveDatas(String phpFile, int displayMode, int articleItem) {
         Serial.println("Parsing input failed!");
         return;
       }
-
-      switch (displayMode) {
-        case 1:
-        {
-          myObject["myDatas"] = myDatas;
-          //affiche date en haut
-          JSONVar date = myDatas["root"]["date"];
-          JSONVar myarrayPagesOffset = myDatas["root"]["pages"];
-          int nbPagesOfList = myarrayPagesOffset.length();
-          // for (int po = 0; po < nbPagesOfList - 1; po++) {
-          //   Serial.println(String(po));
-          //   myObject["pageOffset"][(po + 1)] = (int)myarrayPagesOffset[(po + 1)];
-          // }
-          myObject["nbPages"] = nbPagesOfList;
-          minitel.moveCursorXY(18, 2);
-          minitel.attributs(CARACTERE_CYAN);
-          minitel.print("A LA ");
-          minitel.attributs(CARACTERE_BLANC);
-          minitel.print("UNE ");
-          minitel.attributs(CARACTERE_CYAN);
-          minitel.print("CE JOUR");
-          minitel.moveCursorXY(18, 3);
-          minitel.attributs(CARACTERE_BLANC);
-          minitel.print((const char*)date);
-          afficheListe(currentPage);
-        }
-          break;
-
-        case 2:
-        {
-          myObject["myArticle"] = myDatas;
-          myObject["currentPageFolio"] = 0;
-          affichePage(previousDisplayMode);
-          break;
-        }
+      else {
+       myObject["myDatas"] = myDatas;
       }
     }
+   
+        
     Serial.print(myObject);
     // Free resources
     http.end();
@@ -250,12 +350,12 @@ void retrieveDatas(String phpFile, int displayMode, int articleItem) {
   }
 }
 void affichePage(int previousDisplayMode) {
+  Serial.println("affichepage");
   displayNavArticle(previousDisplayMode);
-  
-  Serial.print(myObject["myArticle"]);
+  Serial.print(myObject["myDatas"]["article"]);
   effacementEcran(5, 21);
   minitel.noCursor();
-  JSONVar myDatas = myObject["myArticle"];
+  JSONVar myDatas = myObject["myDatas"];
   minitel.textMode();
   JSONVar myarray = myDatas["article"];
   JSONVar article = (myarray[0]);
@@ -268,7 +368,7 @@ void affichePage(int previousDisplayMode) {
   int textNbLines = texte.length();
   Serial.println(String(titreNbLines));
   Serial.println(String(textNbLines));
-  float nbFolio = (titreNbLines+textNbLines+1)/17.00;
+  float nbFolio = (titreNbLines + textNbLines + 1) / 17.00;
   Serial.println("---");
   Serial.println("nbFolio");
   int folioMax = ceil(nbFolio);
@@ -289,11 +389,10 @@ void affichePage(int previousDisplayMode) {
     minitel.print((const char*)texte[j]);
     posY++;
     nbLines++;
-    if(nbLines==17){
+    if (nbLines == 17) {
       break;
     }
   }
-
 }
 void afficheListe(int page) {
   minitel.noCursor();
@@ -301,15 +400,18 @@ void afficheListe(int page) {
   minitel.textMode();
   JSONVar myarray = myDatas["root"]["articles"];
   JSONVar myarrayPagesOffset = myDatas["root"]["pages"];
+  Serial.println("mydataspagesoffset");
   Serial.println(myarrayPagesOffset);
   //Serial.println()
   int nbArticles = (int)myarrayPagesOffset[(page + 1)] - (int)myarrayPagesOffset[(page)];
   nbArticles += (int)myarrayPagesOffset[(page)];
   Serial.println("nbarcticles");
+  Serial.println(nbArticles);
   Serial.println(myarrayPagesOffset[(page + 1)]);
   int i = 0;
   int posY = 5;
-
+  JSONVar format = myObject["format"];
+  String sformat = (const char*)format; 
   for (i = myarrayPagesOffset[(page)]; i < nbArticles; i++) {
     JSONVar article = (myarray[i]);
     JSONVar titre = article["titre"];
@@ -317,6 +419,8 @@ void afficheListe(int page) {
     int titreNbLines = titre.length();
 
     for (j = 0; j < titreNbLines; j++) {
+
+      if(sformat=="UNE"){
       if (j == 0) {
         minitel.attributs(CARACTERE_BLANC);
         minitel.moveCursorXY(0, posY);
@@ -325,8 +429,16 @@ void afficheListe(int page) {
       minitel.moveCursorXY(4, posY);
       minitel.attributs(CARACTERE_BLANC);
       minitel.print((const char*)titre[j]);
+      }
+      else {
+      minitel.moveCursorXY(1, posY);
+      minitel.attributs(CARACTERE_BLANC);
+      minitel.print((const char*)titre[j]);
+      }
       posY++;
+
     }
+
     if (i < (nbArticles - 1)) {
       minitel.attributs(CARACTERE_BLEU);
       minitel.moveCursorXY(0, posY);
