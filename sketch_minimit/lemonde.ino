@@ -8,9 +8,9 @@ void setupLeMonde() {
   afficheUNELEMONDE();
 }
 
-void initLEMONDE(){
+void initLEMONDE() {
   minitel.newScreen();
-  
+
   myObject["currentPage"] = (int)0;
   myObject["displayMode"] = (int)1;
   //Displaymode
@@ -19,20 +19,21 @@ void initLEMONDE(){
   myObject["format"] = "UNE";
   ///UNE ou BRE
   displayBandeau();
-  
+  userInput = "";
+  userInputLength = 0;
 }
-void resetPagesLEMONDE(){
+void resetPagesLEMONDE() {
   myObject["currentPage"] = (int)0;
   myObject["displayMode"] = (int)1;
 }
-void afficheUNELEMONDE(){
+void afficheUNELEMONDE() {
   myObject["format"] = "UNE";
   updateBandeauLEMONDE("UNE");
   displayNavList();
   retrieveDatasLEMONDE("lemonde/getjson.php?current=", 1, 1);
   afficheDatasLEMONDE();
 }
-void afficheBRELEMONDE(){
+void afficheBRELEMONDE() {
   myObject["format"] = "BRE";
   minitel.newScreen();
   displayBandeau();
@@ -42,34 +43,33 @@ void afficheBRELEMONDE(){
   afficheDatasLEMONDE();
 }
 
-void repetitionLEMONDE(){
+void repetitionLEMONDE() {
   JSONVar format = myObject["format"];
-  String sformat = (const char*)format; 
+  String sformat = (const char*)format;
   int displayMode = myObject["displayMode"];
-  if(sformat=="UNE"){
-    if (displayMode==1){
-      afficheUNELEMONDE();      
+  if (sformat == "UNE") {
+    if (displayMode == 1) {
+      afficheUNELEMONDE();
     }
   }
 }
-void sommaireLEMONDE(){
+void sommaireLEMONDE() {
   initLEMONDE();
   afficheUNELEMONDE();
-}           
+}
 void displayBandeau() {
   String vdt = "14,0c,1f,41,41,0e,1b,54,20,38,24,20,2c,38,38,30,20,12,43,28,30,20,12,59,1f,42,41,0e,1b,54,20,1b,57,1b,44,4a,1b,54,1b,47,48,1b,57,1b,44,46,1b,54,20,1b,57,4a,12,42,49,1b,54,1b,47,34,1b,57,1b,44,48,1b,54,1b,47,34,1b,57,1b,44,49,4a,29,1b,54,1b,47,24,20,12,57,1f,43,41,0e,1b,54,40,45,2a,38,40,25,1b,57,1b,44,4a,1b,54,1b,47,45,45,25,25,1b,57,1b,44,4a,1b,54,1b,47,45,25,45,24,20,12,57,1f,44,41,0e,1b,44,23,12";
   checkScreen(vdt, 0, 0);
   minitel.textMode();
-  
 }
 void displayNavArticle(int previousDisplayMode) {
   if (previousDisplayMode == 1) {
-    minitel.moveCursorXY(1, 24);
+    minitel.moveCursorXY(31, 23);
     minitel.print(" ");
-    minitel.repeat(22);
-    minitel.moveCursorXY(1, 24);
+    minitel.repeat(8);
+    minitel.moveCursorXY(31, 23);
     minitel.attributs(CARACTERE_MAGENTA);
-    minitel.print("Revenir au ");
+    //minitel.print("Revenir au ");
     minitel.attributs(INVERSION_FOND);
     minitel.print(" SOMMAIRE ");
     minitel.attributs(FOND_NORMAL);
@@ -94,30 +94,28 @@ void displayNavList() {
   minitel.attributs(FOND_NORMAL);
   minitel.moveCursorXY(2, 24);
   minitel.attributs(CARACTERE_MAGENTA);
-  if (sformat=="UNE")
-  {
+  if (sformat == "UNE") {
     minitel.print("Les brèves ");
     minitel.attributs(CARACTERE_BLANC);
     minitel.print("BRE");
     minitel.attributs(DEBUT_LIGNAGE);
     minitel.writeByte(0x20);
     minitel.attributs(INVERSION_FOND);
-    minitel.attributs(CARACTERE_BLANC);    
+    minitel.attributs(CARACTERE_BLANC);
+  } else {
+    minitel.print("  A la Une ");
+    minitel.attributs(CARACTERE_BLANC);
+    minitel.print("UNE");
+    minitel.attributs(DEBUT_LIGNAGE);
+    minitel.writeByte(0x20);
+    minitel.attributs(INVERSION_FOND);
+    minitel.attributs(CARACTERE_BLANC);
   }
-  else {
-  minitel.print("  A la Une ");
-  minitel.attributs(CARACTERE_BLANC);
-  minitel.print("UNE");
-  minitel.attributs(DEBUT_LIGNAGE);
-  minitel.writeByte(0x20);
-  minitel.attributs(INVERSION_FOND);
-  minitel.attributs(CARACTERE_BLANC);
-  }
- 
+
   minitel.print(" ENVOI ");
   minitel.attributs(FOND_NORMAL);
 
-  minitel.moveCursorXY(26, 23);
+  minitel.moveCursorXY(26, 24);
   minitel.attributs(CARACTERE_CYAN);
   minitel.attributs(DEBUT_LIGNAGE);
   minitel.writeByte(0x20);
@@ -133,14 +131,85 @@ boolean isValidNumber(String str) {
   }
   return false;
 }
+void suiteListe() {
+  int currentPage = myObject["currentPage"];
+  int nbPages = myObject["nbPages"];
+  if (currentPage == nbPages - 1) {
+    return;
+  }
+  myObject["currentPage"] = (int)(myObject["currentPage"]) + 1;
+  Serial.println(myObject);
+  effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
+  afficheListe(myObject["currentPage"]);
+}
+void retourListe() {
+  int currentPage = myObject["currentPage"];
+  int nbPages = myObject["nbPages"];
+  if (currentPage == 0) {
+    return;
+  }
+  myObject["currentPage"] = (int)(myObject["currentPage"]) - 1;
+  Serial.println(myObject);
+  effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
+  afficheListe(myObject["currentPage"]);
+}
+void retourArticle() {
+  Serial.println("retourarticle");
+  int folioMax = myObject["folioMax"];
+  if (folioMax > 1) {
+    int currentFolio = myObject["currentFolio"];
+    currentFolio++;
+    myObject["currentFolio"] = currentFolio;
+    afficheArticleNextPrevious(-1);
+  } else {
+    Serial.print("else");
+    int currentPage = myObject["currentPage"];
+    int nbPages = myObject["nbPages"];
+    if (currentPage == 0) {
+      return;
+    }
+    Serial.print("icinextarticle");
+    previousArticle();
+  }
+}
+void suiteArticle() {
+  Serial.println("suitearticle");
+  int folioMax = myObject["folioMax"];
+  if (folioMax > 1) {
+    int currentFolio = myObject["currentFolio"];
+    currentFolio++;
+    myObject["currentFolio"] = currentFolio;
+    afficheArticleNextPrevious(1);
+  } else {
+    Serial.print("else");
+    int currentPage = myObject["currentPage"];
+    int nbPages = myObject["nbPages"];
+    if (currentPage == nbPages - 1) {
+      return;
+    }
+    Serial.print("icinextarticle");
+    nextArticle();
+  }
+}
+void nextArticle() {
+  int currentArticle = myObject["currentArticle"];
+  currentArticle++;
+  retrieveDatasLEMONDE("lemonde/getjson.php?mode=article&item=" + String(currentArticle), 2, currentArticle);
+  afficheArticle((int)myObject["displayMode"]);
+}
+void previousArticle() {
+  int currentArticle = myObject["currentArticle"];
+  currentArticle--;
+  retrieveDatasLEMONDE("lemonde/getjson.php?mode=article&item=" + String(currentArticle), 2, currentArticle);
+  afficheArticle((int)myObject["displayMode"]);
+}
 void lectureChampLeMonde(int x, int y, int longueurchamp) {
-  Serial.print("lc");
   champVide(x, y, longueurchamp);
   boolean fin = false;
   while (!fin) {
     touche = minitel.getKeyCode();
     if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
-      if (userInputNeeded < longueurchamp) {
+      if (userInput.length() < longueurchamp) {
         userInputNeeded++;
         userInput += char(touche);
         Serial.print(userInput);
@@ -152,38 +221,57 @@ void lectureChampLeMonde(int x, int y, int longueurchamp) {
     }
     switch (touche) {
       case CONNEXION_FIN:
-        fin=true;
+        fin = true;
         minitel.connexion(false);
         displayMire();
-      break;
+        break;
       case SUITE:
         {
           Serial.println("suite");
-          int currentPage = myObject["currentPage"];
-          int nbPages = myObject["nbPages"];
-          if (currentPage == nbPages - 1) {
-            break;
+          int displayMode = myObject["displayMode"];
+          switch (displayMode) {
+            case 1:
+              {
+                suiteListe();
+                fin = true;
+              }
+              break;
+            case 2:
+              {
+                suiteArticle();
+                fin = true;
+              }
+              break;
           }
-          Serial.println("nbpages");
-          Serial.println(myObject["nbPages"]);
-          Serial.println("currentpage");
-          Serial.println(myObject["currentPage"]);
-          myObject["currentPage"] = (int)(myObject["currentPage"]) + 1;
-          Serial.println(myObject);
-          effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
-          fin = true;
-          afficheListe(myObject["currentPage"]);
         }
+
         break;
       case RETOUR:
+      {
+        Serial.print("retour");
         if ((int)myObject["currentPage"] == 0) {
           break;
         }
-        myObject["currentPage"] = (int)(myObject["currentPage"]) - 1;
-        effacementEcran(5, 21,CARACTERE_NOIR, FOND_NOIR);
-        fin = true;
-        afficheListe(myObject["currentPage"]);
+        int displayMode = myObject["displayMode"];
+          switch (displayMode) {
+            case 1:
+              {
+                retourListe();
+                fin = true;
+              }
+              break;
+            case 2:
+              {
+                retourArticle();
+                fin = true;
+              }
+              break;
+          }
+      }
+       
         break;
+
+
       case ENVOI:
         fin = true;
         Serial.println("envoi");
@@ -191,43 +279,66 @@ void lectureChampLeMonde(int x, int y, int longueurchamp) {
         if (userInputNeeded > 0) {
           Serial.println("choix");
           Serial.println(userInput);
-          if(!isValidNumber(userInput)){
+          if (!isValidNumber(userInput)) {
             if (userInput == "BRE") {
-             afficheBRELEMONDE();
+              afficheBRELEMONDE();
+              myObject["format"] = "BRE";
+              updateBandeauLEMONDE("BRE");
+              myObject["currentPage"] = (int)0;
+              myObject["displayMode"] = (int)1;
             }
             if (userInput == "UNE") {
               myObject["format"] = "UNE";
               updateBandeauLEMONDE("UNE");
+              displayNavList();
               myObject["currentPage"] = (int)0;
               myObject["displayMode"] = (int)1;
               retrieveDatasLEMONDE("lemonde/getjson.php?mode=liste&format=une", 1, 0);
-              effacementEcran(5, 21,CARACTERE_NOIR, FOND_NOIR);
+              effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
               afficheDatasLEMONDE();
             }
           }
-          
+
           else {
             int userInputInt = userInput.toInt();
             userInputInt--;
             retrieveDatasLEMONDE("lemonde/getjson.php?mode=article&item=" + String(userInputInt), 2, userInputInt);
             afficheDatasLEMONDE();
           }
+          userInput = "";
         }
         break;
       case SOMMAIRE:
         fin = true;
+        userInput = "";
+        userInputLength = 0;
         sommaireLEMONDE();
         break;
       case ANNULATION:
+        fin = true;
+        userInput = "";
+        userInputLength = 0;
         champVide(x, y, longueurchamp);
         break;
       case CORRECTION:
-        //correction(longueurchamp); TODO
+        {
+          Serial.println("correction");
+          int nbCaracteres = userInput.length();
+          Serial.print(nbCaracteres);
+          if (nbCaracteres > 0) {
+            minitel.moveCursorLeft(1);
+            minitel.print(".");
+            minitel.attributs(CARACTERE_BLANC);
+            minitel.moveCursorLeft(1);
+            userInput = userInput.substring(0, userInput.length() - 1);
+            userInputLength--;
+            Serial.println(userInput);
+          }
+        }
         break;
     }
   }
 }
-
 void updateBandeauLEMONDE(String format) {
   if (format == "BRE") {
     minitel.moveCursorXY(18, 2);
@@ -261,7 +372,9 @@ void afficheDatasLEMONDE() {
         myObject["nbPages"] = nbPagesOfList;
 
         minitel.moveCursorXY(18, 3);
+        minitel.attributs(FIN_LIGNAGE);
         minitel.attributs(CARACTERE_BLANC);
+        minitel.attributs(FOND_BLEU);
         minitel.print((const char*)date);
         afficheListe(currentPage);
       }
@@ -269,16 +382,17 @@ void afficheDatasLEMONDE() {
 
     case 2:
       {
-        myObject["myArticle"] =  myObject["myDatas"];
+        myObject["myArticle"] = myObject["myDatas"];
         myObject["currentPageFolio"] = 0;
         int previousDisplayMode = myObject["previousDisplayMode"];
-        affichePage(previousDisplayMode);
+        afficheArticle(previousDisplayMode);
         break;
       }
   }
 }
 
 void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
+  ligneZero("Recherche...");
   int previousDisplayMode = myObject["displayMode"];
   myObject["previousDisplayMode"] = previousDisplayMode;
   myObject["displayMode"] = displayMode;
@@ -292,7 +406,7 @@ void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
         break;
       case 2:
         serverPath = serverName + String(phpFile);
-        Serial.println(serverPath);
+        myObject["currentArticle"] = articleItem;
         break;
     }
     http.begin(serverPath.c_str());
@@ -305,25 +419,79 @@ void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
         Serial.println(payload);
         Serial.println("Parsing input failed!");
         return;
-      }
-      else {
-       myObject["myDatas"] = myDatas;
+      } else {
+        myObject["myDatas"] = myDatas;
       }
     }
-   
-        
-    Serial.print(myObject);
+   Serial.print(myObject);
     // Free resources
     http.end();
   } else {
     Serial.println("WiFi Disconnected");
   }
+  ligneZero(" ");
 }
-void affichePage(int previousDisplayMode) {
+void afficheArticleNextPrevious(int sens) {
+  Serial.println("nextprevisou");
+  effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
+  afficheFolio();
+  JSONVar myDatas = myObject["myDatas"];
+  minitel.textMode();
+  JSONVar myarray = myDatas["article"];
+  JSONVar article = (myarray[0]);
+  JSONVar texte = article["texte"];
+  Serial.println("textelenght");
+  Serial.print(texte.length());
+  int lastLineArticle = myObject["lastlineArticle"];
+  if (lastLineArticle >= texte.length()) {
+    if (sens==1){
+      nextArticle();
+    }
+    else {
+      previousArticle();
+    }
+    return;
+  }
+  int posY = 5;
+  Serial.println("lastLineArticle");
+  Serial.println(lastLineArticle);
+  int nbLines = 0;
+  int j;
+  minitel.attributs(CARACTERE_CYAN);
+  for (j = lastLineArticle; j < (lastLineArticle + 17); j++) {
+    minitel.moveCursorXY(0, posY);
+    minitel.print((const char*)texte[j]);
+    posY++;
+    nbLines++;
+    lastLineArticle++;
+    if (nbLines == 17) {
+      myObject["lastlineArticle"] = lastLineArticle;
+      break;
+    }
+  }
+}
+void afficheFolio() {
+  int folioMax = myObject["folioMax"];
+  int currentFolio = myObject["currentFolio"];
+  if (folioMax > 1) {
+    minitel.newXY(35, 22);
+    minitel.attributs(CARACTERE_BLEU);
+    minitel.print(String(currentFolio + 1));
+    minitel.print("/");
+    minitel.print(String(folioMax));
+  } else {
+    minitel.attributs(CARACTERE_BLEU);
+    minitel.moveCursorXY(35, 22);
+    minitel.writeByte(0x60);
+    minitel.repeat(4);
+  }
+}
+void afficheArticle(int previousDisplayMode) {
   Serial.println("affichepage");
+  myObject["currentFolio"] = 0;
   displayNavArticle(previousDisplayMode);
   Serial.print(myObject["myDatas"]["article"]);
-  effacementEcran(5, 21,CARACTERE_NOIR, FOND_NOIR);
+  effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
   minitel.noCursor();
   JSONVar myDatas = myObject["myDatas"];
   minitel.textMode();
@@ -336,13 +504,10 @@ void affichePage(int previousDisplayMode) {
   int j = 0;
   int titreNbLines = titre.length();
   int textNbLines = texte.length();
-  Serial.println(String(titreNbLines));
-  Serial.println(String(textNbLines));
   float nbFolio = (titreNbLines + textNbLines + 1) / 17.00;
-  Serial.println("---");
-  Serial.println("nbFolio");
   int folioMax = ceil(nbFolio);
-  Serial.println(String(folioMax));
+  myObject["folioMax"] = folioMax;
+  afficheFolio();
   minitel.attributs(CARACTERE_BLANC);
   for (j = 0; j < titreNbLines; j++) {
     minitel.moveCursorXY(0, posY);
@@ -360,6 +525,7 @@ void affichePage(int previousDisplayMode) {
     posY++;
     nbLines++;
     if (nbLines == 17) {
+      myObject["lastlineArticle"] = j+1;
       break;
     }
   }
@@ -381,7 +547,7 @@ void afficheListe(int page) {
   int i = 0;
   int posY = 5;
   JSONVar format = myObject["format"];
-  String sformat = (const char*)format; 
+  String sformat = (const char*)format;
   for (i = myarrayPagesOffset[(page)]; i < nbArticles; i++) {
     JSONVar article = (myarray[i]);
     JSONVar titre = article["titre"];
@@ -390,23 +556,21 @@ void afficheListe(int page) {
 
     for (j = 0; j < titreNbLines; j++) {
 
-      if(sformat=="UNE"){
-      if (j == 0) {
+      if (sformat == "UNE") {
+        if (j == 0) {
+          minitel.attributs(CARACTERE_BLANC);
+          minitel.moveCursorXY(0, posY);
+          minitel.print(String(i + 1));
+        }
+        minitel.moveCursorXY(4, posY);
         minitel.attributs(CARACTERE_BLANC);
-        minitel.moveCursorXY(0, posY);
-        minitel.print(String(i + 1));
-      }
-      minitel.moveCursorXY(4, posY);
-      minitel.attributs(CARACTERE_BLANC);
-      minitel.print((const char*)titre[j]);
-      }
-      else {
-      minitel.moveCursorXY(1, posY);
-      minitel.attributs(CARACTERE_BLANC);
-      minitel.print((const char*)titre[j]);
+        minitel.print((const char*)titre[j]);
+      } else {
+        minitel.moveCursorXY(1, posY);
+        minitel.attributs(CARACTERE_BLANC);
+        minitel.print((const char*)titre[j]);
       }
       posY++;
-
     }
 
     if (i < (nbArticles - 1)) {
@@ -418,4 +582,6 @@ void afficheListe(int page) {
     }
   }
   minitel.cursor();
+  Serial.println("mydataspagesoffset");
+  Serial.println(myarrayPagesOffset);
 }

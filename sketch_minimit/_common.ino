@@ -2,18 +2,27 @@ void champVide(int x, int y, int longueurchamp) {
   minitel.textMode();
   minitel.noCursor();
   minitel.moveCursorXY(x, y);
-  minitel.attributs(CARACTERE_BLANC);
+  minitel.attributs(saisieColor);
   for (int j = 0; j < longueurchamp; j++) {
     minitel.print(".");
   }
   minitel.moveCursorXY(x, y);
   minitel.cursor();
   minitel.echo(true);
+  userInput="";
+  userInputLength=0;
 }
 
 void wifiConnect() {
   if (WiFi.status() == WL_CONNECTED)return;
+
+  JSONVar config = myConfig["input"];
+  const char* ssid = (const char*)config[0];
+  const char* password = (const char*)config[1];
+
   WiFi.begin(ssid, password);
+  Serial.print(ssid);
+  Serial.print(password);
   Serial.println("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     WiFi.begin(ssid, password);
@@ -24,9 +33,7 @@ void wifiConnect() {
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());
 }
-// byte stringToByte(char * src){
-//     return byte(atoi(src));
-// }
+
 void afficheRemoteVDT(String vdtFile, int offsetY, int offsetX) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
@@ -41,11 +48,11 @@ void afficheRemoteVDT(String vdtFile, int offsetY, int offsetX) {
   }
 }
 void checkScreen(String s, int offsetY, int offsetX){
+  minitel.noCursor();
   unsigned int str_len = s.length() + 2;
   int i = 0;
   int positionnement = 0;
   int startpositionnement = -1;
-  int cnt = 0;
   for (i=0; i<str_len; i+=3)
   {
     String myByte = "0x" + s.substring(i,i+2);
@@ -126,4 +133,15 @@ void effacementEcran(int y1, int y2, int attribut1, int attribut2) {
   //minitel.cursor();
   //minitel.attributs(FOND_NORMAL);
   minitel.textMode();
+}
+void ligneZero(String message)
+{
+  int mx = minitel.getCursorX();
+  int my = minitel.getCursorY();
+  minitel.newXY(1, 0);
+  minitel.print(" ");
+  minitel.repeat(30);
+  minitel.newXY(1, 0);
+  minitel.print(message);
+  minitel.newXY(mx,my);
 }

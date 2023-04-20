@@ -86,8 +86,7 @@ void lectureChampMeteo(int x, int y, int longueurchamp) {
 }
 void afficheDatasMETEO() {
   minitel.noCursor();
-  //effacementEcran(21,24,CARACTERE_BLEU, FOND_BLEU);
-  effacementEcran(11, 20, CARACTERE_BLEU, FOND_BLEU);
+  effacementEcran(11, 20, CARACTERE_NOIR, FOND_NOIR);
   afficheRemoteVDT("meteo_effacement.vdt", 0, 0);
   minitel.textMode();
   JSONVar forecast = myObject["root"]["forecast"];
@@ -131,11 +130,13 @@ void afficheDatasMETEO() {
   String modeprecipitations = (const char*)precipitations["mode"];
   String valuePrecipations = "";
   if (modeprecipitations == "no") {
-    valuePrecipations = "0";
+    //valuePrecipations = "0";
   } else {
-    valuePrecipations = precipitations["value"];
+    // valuePrecipations = precipitations["value"];
+    
   }
-  minitel.print(valuePrecipations);
+  //minitel.print(valuePrecipations);
+  minitel.print("0mm");
   minitel.moveCursorXY(12, 9);
   minitel.attributs(CARACTERE_CYAN);
   minitel.print("Vent");
@@ -164,23 +165,27 @@ void afficheDatasMETEO() {
   minitel.moveCursorXY(10, 11);
   minitel.attributs(CARACTERE_CYAN);
   minitel.attributs(GRANDEUR_NORMALE);
+  minitel.attributs(FOND_NORMAL);
+  //minitel.attributs(FOND_BLEU);
+  minitel.attributs(CARACTERE_BLEU);
   minitel.print((const char*)currentweather["dt"]);
-  afficheRemoteVDT((const char*)icon + String(".vdt"), 11, 2);
+  afficheRemoteVDT((const char*)icon + String(".vdt"), 11, 4);
   //
   minitel.textMode();
   minitel.moveCursorXY(30, 11);
   minitel.attributs(CARACTERE_CYAN);
   minitel.print((const char*)nextweather["dt"]);
-  afficheRemoteVDT((const char*)nexticon + String(".vdt"), 11, 22);
+  afficheRemoteVDT((const char*)nexticon + String(".vdt"), 11, 24);
   minitel.textMode();
   minitel.moveCursorXY(2, 22);
   minitel.attributs(CARACTERE_BLANC);
+  minitel.attributs(FOND_BLEU);
   minitel.print((const char*)oldMeteo["date"]);
   minitel.print(" à ");
   minitel.print((const char*)oldMeteo["station"]);
   minitel.moveCursorXY(2, 23);
   minitel.attributs(CARACTERE_CYAN);
-  minitel.print("Précipitations ");
+  minitel.print("Précipit. ");
   minitel.attributs(CARACTERE_BLANC);
   minitel.print((const char*)oldMeteo["pluie"]);
   minitel.attributs(CARACTERE_CYAN);
@@ -203,7 +208,7 @@ void retrieveDatasMETEO() {
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
       String payload = http.getString();
-      Serial.println("");
+      Serial.println("PAYLOADMETEO");
       Serial.print(payload);
       Serial.println("");
       //Serial.println(buf[i], HEX);
@@ -220,4 +225,16 @@ void retrieveDatasMETEO() {
   } else {
     Serial.println("WiFi Disconnected");
   }
+}
+
+void effacementEcranMeteo(int y1, int y2) {
+  minitel.noCursor();
+  minitel.attributs(FIN_LIGNAGE);
+  //minitel.attributs(FOND_BLEU);
+  //minitel.attributs(CARACTERE_BLEU);
+  for (int i = 0; i <= (y2 - y1); i++) {
+    minitel.moveCursorXY(1, (y2 - i));
+    minitel.clearLine();
+  }
+  minitel.cursor();
 }
