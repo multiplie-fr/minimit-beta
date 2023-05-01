@@ -89,7 +89,7 @@ void setupPong() {
   //     minitel.searchSpeed();               // search speed again if change has failed
   //   }
   // }
-
+  //minitel.changeSpeed(4800);
   minitel.modeVideotex();
 
   minitel.echo(false);

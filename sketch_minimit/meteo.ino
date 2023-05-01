@@ -76,9 +76,10 @@ void lectureChampMeteo(int x, int y, int longueurchamp) {
         break;
       case SOMMAIRE:
         {
-          afficheInterfaceMeteo();
           userInput = "";
           userInputLength = 0;
+          afficheInterfaceMeteo();
+          
         }
         break;
     }

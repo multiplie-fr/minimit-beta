@@ -49,6 +49,7 @@ void lectureChampEliza(int premiereLigne, int nbLignes) {
     }
     switch (touche) {
       case CONNEXION_FIN:
+        fin = true;
         minitel.connexion(false);
         displayMire();
       break;

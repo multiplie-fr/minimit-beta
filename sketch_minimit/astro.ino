@@ -63,8 +63,8 @@ void lectureChampAstro(int x, int y, int longueurchamp) {
         break;
       case REPETITION:
         {
-         String page = (const char*)myObject["currentPage"];
-         if(page=="SOMMAIRE"){
+        // String page = (const char*)myObject["currentPage"];
+         if(currentEcran=="SOMMAIRE"){
           champVide(x, y, longueurchamp);
           userInput = "";
           userInputLength = 0;

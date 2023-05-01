@@ -30,9 +30,12 @@ JSONVar myObject = {};
 JSONVar myConfig = {};
 int currentService = SERVICE_MIRE;
 String currentEcran = "SOMMAIRE";
-String confFile = "/conf1.txt";
-int saisieColor = CARACTERE_CYAN;
+String confFile = "/conf3.txt";
+int saisieColor = CARACTERE_JAUNE;
 const char* serverName = "https://xn--multipli-i1a.fr/minimit/prod/";
+boolean interruption = false;
+int timeoutAmount = 5000;
+long nextUpdate = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -55,7 +58,7 @@ void displayDemarrage() {
   } else {
     isConfig = 1;
   }
-  String vdt = "14,0c,1f,46,54,0e,1b,46,40,50,1f,47,53,0e,1b,46,58,1b,56,20,20,1b,40,22,1b,50,1b,46,30,1f,48,51,0e,1b,46,40,1b,56,1b,40,21,20,20,20,20,1b,45,58,1f,49,51,0e,1b,56,1b,40,21,20,20,20,1b,45,40,1b,55,1b,46,21,1b,40,30,1f,4a,51,0e,1b,56,20,12,42,1b,45,58,1b,55,1b,40,40,1b,50,1b,45,21,4a,1f,4b,51,0e,1b,56,1b,40,30,20,20,1b,55,48,1b,50,20,20,1b,55,25,1b,50,1b,45,30,1f,4c,51,0e,1b,46,22,1b,56,1b,40,30,20,1b,55,4a,1b,50,1b,45,40,1b,55,1b,40,21,20,20,1b,50,1b,45,54,1f,4d,53,0e,1b,56,1b,40,54,1b,55,22,20,20,20,20,40,1b,50,1b,45,21,1f,4e,54,0e,1b,45,22,1b,55,1b,40,30,20,20,58,1f,4f,56,0e,1b,55,1b,40,54,1b,50,1b,45,21,09,09,1b,47,40,1f,50,4f,0e,4a,49,49,42,4a,49,42,4a,49,49,42,4a,21,1f,51,4f,0e,2a,12,4a,22,24";
+  String vdt = "14,0c,1f,46,54,0e,1b,46,40,50,1f,47,53,0e,1b,46,58,1b,56,20,20,1b,40,22,1b,50,1b,46,30,1f,48,51,0e,1b,46,40,1b,56,1b,40,21,20,12,43,1b,45,58,1f,49,51,0e,1b,56,1b,40,21,20,12,42,1b,45,40,1b,55,1b,46,21,1b,40,30,1f,4a,51,0e,1b,56,20,12,42,1b,45,58,1b,55,1b,40,40,1b,50,1b,45,21,4a,1f,4b,51,0e,1b,56,1b,40,30,20,20,1b,55,48,1b,50,20,20,1b,55,25,1b,50,1b,45,30,1f,4c,51,0e,1b,46,22,1b,56,1b,40,30,20,1b,55,4a,1b,50,1b,45,40,1b,55,1b,40,21,20,20,1b,50,1b,45,54,1f,4d,53,0e,1b,56,1b,40,54,1b,55,22,20,12,43,40,1b,50,1b,45,21,1f,4e,54,0e,1b,45,22,1b,55,1b,40,30,20,20,58,1f,4f,56,0e,1b,55,1b,40,54,1b,50,1b,45,21,09,09,1b,47,40,1f,50,4f,0e,4a,49,49,42,4a,49,42,4a,49,49,42,4a,21,1f,51,4f,0e,2a,12,4a,22,24";
   minitel.noCursor();
   checkScreen(vdt, 0, 0);
   minitel.echo(false);
@@ -83,12 +86,10 @@ boolean checkConnexion() {
     JSONVar config = myConfig["input"];
     // const char* ssid = (const char*)config[0];
     // const char* password = (const char*)config[1];
-
-
-    const char* ssid = "Dogtown";
-   const char* password = "west100-;";
-  //   const char* ssid = "Livebox-Xine";
-  //  const char* password = "malakoff";
+    //   const char* ssid = "Dogtown";
+    //  const char* password = "west100-;";
+    const char* ssid = "Livebox-Xine";
+   const char* password = "malakoff";
 
     WiFi.begin(ssid, password);
     int cnt = 0;
@@ -141,8 +142,8 @@ void loop() {
       lectureChampEliza(1,4);
       break;
     case SERVICE_GALERIE:
-      lectureChampGalerie(28, 3, 0);
       loopGalerie();
+      //lectureChampGalerie(32, 23, 1);
       break;
     case SERVICE_LEMONDE:
       lectureChampLeMonde(13, 23, 3);
@@ -152,6 +153,9 @@ void loop() {
       break;
     case SERVICE_PENDU:
       lectureChampPendu(11, 17, 1);
+      break;
+    case SERVICE_PPP:
+      lectureChampPPP(25, 12, 5);
       break;
     case SERVICE_TAROT:
       lectureChampTarots(16, 5, 5);
@@ -166,16 +170,18 @@ void loop() {
 }
 
 void displayMire() {
-  ligneZero(" ");
-  saisieColor = CARACTERE_MAGENTA;
+  Serial.println("displaymire");
   currentService = SERVICE_MIRE;
   currentEcran = "SOMMAIRE";
+  ligneZero(" ");
+  saisieColor = CARACTERE_JAUNE;
+  minitel.pageMode();
   minitel.newScreen();
   minitel.newXY(1, 0);
   minitel.attributs(FOND_NORMAL);
   minitel.print(" ");
   minitel.repeat(30);
-  String vdt = "0c,14,1f,42,41,0e,1b,5a,31,0b,08,60,26,23,23,6d,30,0a,0a,08,60,0a,08,38,08,08,0a,26,08,08,2c,08,08,2c,08,08,2b,0b,08,30,08,08,61,31,21,21,0b,08,08,08,08,60,66,12,42,26,0b,08,08,08,38,12,43,1f,41,4a,0e,1b,54,18,0a,18,0a,18,0a,18,1f,42,4b,0e,1b,54,20,12,42,30,20,20,30,20,12,42,30,30,1f,43,4b,0e,1b,57,1b,44,48,48,1b,54,1b,47,34,34,1b,57,1b,44,48,1b,54,1b,47,34,34,1b,57,1b,44,48,48,1b,54,1b,47,34,34,1b,57,1b,44,48,1f,44,4b,0e,1b,54,25,12,4a,29,1f,45,4b,0e,1b,44,23,12,4b,1f,45,4a,1b,44,60,12,5e,1f,44,60,1b,4f,1b,44,1b,5d,33,36,31,35,1f,44,5f,1b,44,1b,5d,1b,4d,1b,51,20,08,1b,55,20,08,1b,52,20,08,1b,56,20,08,1b,53,20,08,1b,57,20,1f,46,49,1b,44,20,1b,5d,18,53,69,20,6f,6e,20,19,42,65,74,61,69,74,20,65,6e,63,6f,72,65,20,65,6e,20,31,39,38,33,2c,20,12,42,1f,47,49,1b,5a,20,1b,44,1b,5d,18,63,65,20,6d,69,6e,69,74,65,6c,20,76,6f,75,73,20,61,75,72,61,69,74,20,63,6f,19,43,75,74,19,42,65,20,20,1f,48,49,1b,41,1b,5a,20,1b,5d,18,1f,49,49,1b,44,1b,5a,20,1b,5d,18,30,2c,31,32,46,20,19,41,61,20,6c,61,20,63,6f,6e,6e,65,78,69,6f,6e,20,1f,4a,49,1b,44,1b,5a,20,1b,5d,18,70,75,69,73,20,31,2c,32,39,46,20,6c,61,20,6d,69,6e,75,74,65,1f,4b,49,1b,44,1b,5a,20,1b,5d,64,6f,6e,74,20,46,2e,54,45,4c,45,43,4f,4d,20,4f,2c,31,32,20,19,41,61,20,4f,2c,35,4f,46,2f,6d,69,6e,1b,5c,1b,59,20,12,47,1b,44,1b,5a,20,1b,5d,1b,45,18,20,12,44,53,45,52,56,49,43,45,53,20,44,49,53,50,4f,4e,49,42,4c,45,53,20,1b,44,1f,4d,49,1b,44,20,1b,5d,18,41,6e,6e,75,61,69,72,65,2c,20,6d,19,42,65,74,19,42,65,6f,2c,20,61,63,74,75,61,6c,69,74,19,42,65,73,2c,20,12,42,1b,5c,20,12,47,1b,44,1b,5a,20,1b,5d,18,61,73,74,72,6f,2c,20,74,61,72,6f,74,73,2e,12,42,20,20,74,61,70,65,7a,20,47,55,49,44,45,1b,5c,1f,52,41,1b,44,20,12,67,1f,4f,41,1b,44,60,12,67,1f,50,41,63,6f,64,65,0a,0d,64,75,20,73,65,72,76,69,63,65,3a,1f,53,41,1b,44,60,12,67,0a,28,43,29,0a,0d,6d,75,6c,74,69,70,6c,69,19,42,65,0a,0d,32,30,32,33,1f,53,41,1b,44,60,12,67,1f,54,4b,18,0a,18,0a,18,0a,18,0a,18,0a,1f,53,61,1b,5d,20,45,6e,76,6f,69,20,20,1f,56,4b,1b,4d,41,4e,4e,55,41,49,52,45,20,44,45,53,20,53,45,52,56,49,43,45,53,1b,5a,1b,47,1b,4d,20,1b,5d,20,47,75,69,64,65,20,20,1f,57,47,1b,47,20,12,43,50,61,72,61,6d,19,41,65,74,72,65,73,20,64,75,20,6d,69,6e,69,6d,69,74,1b,5a,1b,42,20,1b,5d,53,6f,6d,6d,61,69,72,65,1f,58,4b,1b,47,20,12,51,66,69,6e,1b,5a,1b,42,20,1b,5d,20,43,78,2f,46,69,6e,20,1f,51,4c,1b,4c,1b,43,2e,12,5c,1f,51,4c,1b,4c,11";
+  String vdt = "0c,14,1f,42,41,0e,1b,5a,31,0b,08,60,26,23,23,6d,30,0a,0a,08,60,0a,08,38,08,08,0a,26,08,08,2c,08,08,2c,08,08,2b,0b,08,30,08,08,61,31,21,21,0b,08,08,08,08,60,66,12,42,26,0b,08,08,08,38,12,43,1f,41,4a,0e,1b,54,18,0a,18,0a,18,0a,18,1f,42,4b,0e,1b,54,20,12,42,30,20,20,30,20,12,42,30,30,1f,43,4b,0e,1b,57,1b,44,48,48,1b,54,1b,47,34,34,1b,57,1b,44,48,1b,54,1b,47,34,34,1b,57,1b,44,48,48,1b,54,1b,47,34,34,1b,57,1b,44,48,1f,44,4b,0e,1b,54,25,12,4a,29,1f,45,4b,0e,1b,44,23,12,4b,1f,45,4a,1b,44,60,12,5e,1f,44,60,1b,4f,1b,44,1b,5d,33,36,31,35,1f,44,5f,1b,44,1b,5d,1b,4d,1b,51,20,08,1b,55,20,08,1b,52,20,08,1b,56,20,08,1b,53,20,08,1b,57,20,1f,46,49,1b,44,20,1b,5d,18,53,69,20,6f,6e,20,19,42,65,74,61,69,74,20,65,6e,63,6f,72,65,20,65,6e,20,31,39,38,33,2c,20,12,42,1f,47,49,1b,5a,20,1b,44,1b,5d,18,63,65,20,6d,69,6e,69,74,65,6c,20,76,6f,75,73,20,61,75,72,61,69,74,20,63,6f,19,43,75,74,19,42,65,20,20,1f,48,49,1b,41,1b,5a,20,1b,5d,18,1f,49,49,1b,44,1b,5a,20,1b,5d,18,30,2c,31,32,46,20,19,41,61,20,6c,61,20,63,6f,6e,6e,65,78,69,6f,6e,20,1f,4a,49,1b,44,1b,5a,20,1b,5d,18,70,75,69,73,20,31,2c,32,39,46,20,6c,61,20,6d,69,6e,75,74,65,1f,4b,49,1b,44,1b,5a,20,1b,5d,64,6f,6e,74,20,46,2e,54,45,4c,45,43,4f,4d,20,4f,2c,31,32,20,19,41,61,20,4f,2c,35,4f,46,2f,6d,69,6e,1b,5c,1b,59,20,12,47,1b,44,1b,5a,20,1b,5d,1b,45,18,20,12,44,53,45,52,56,49,43,45,53,20,44,49,53,50,4f,4e,49,42,4c,45,53,20,1b,44,1f,4d,49,1b,44,20,1b,5d,18,41,6e,6e,75,61,69,72,65,2c,20,6d,19,42,65,74,19,42,65,6f,2c,20,61,63,74,75,61,6c,69,74,19,42,65,73,2c,20,12,42,1b,5c,20,12,47,1b,44,1b,5a,20,1b,5d,18,61,73,74,72,6f,2c,20,74,61,72,6f,74,73,2e,12,42,20,20,74,61,70,65,7a,20,47,55,49,44,45,1b,5c,1f,52,41,1b,44,20,12,67,1f,4f,41,1b,44,60,12,67,1f,50,41,63,6f,64,65,0a,0d,64,75,20,73,65,72,76,69,63,65,3a,1f,53,41,1b,44,60,12,67,0a,28,43,29,0a,0d,6d,75,6c,74,69,70,6c,69,19,42,65,0a,0d,32,30,32,33,1f,53,41,1b,44,60,12,67,1f,54,4b,18,0a,18,0a,18,0a,18,0a,18,0a,1f,53,61,1b,5d,20,45,6e,76,6f,69,20,20,1f,56,4b,1b,4d,41,4e,4e,55,41,49,52,45,20,44,45,53,20,53,45,52,56,49,43,45,53,1b,5a,1b,47,1b,4d,20,1b,5d,20,47,75,69,64,65,20,20,1f,57,47,1b,47,20,12,43,50,61,72,61,6d,19,41,65,74,72,65,73,20,64,75,20,6d,69,6e,69,6d,69,74,1b,5a,1b,42,20,1b,5d,53,6f,6d,6d,61,69,72,65,1f,58,4b,1b,47,20,12,45,51,75,69,20,61,20,66,61,69,74,20,19,4b,63,61,20,3f,1b,5a,1b,42,20,1b,5d,20,53,75,69,74,65,20,20,1f,48,53,1b,41,1b,4e,1b,5d,1f,51,4c,1b,4c";
   checkScreen(vdt, 0, 0);
   userInput = "";
   userInputLength = 0;
@@ -246,6 +252,7 @@ void lectureChampMire(int x, int y, int longueurchamp) {
         {
           fin = true;
           if (currentEcran == "SOMMAIRE") {
+            checkService(userInput);
           }
           if (currentEcran == "GUIDE") {
             checkService(userInput);
@@ -265,7 +272,7 @@ void lectureChampMire(int x, int y, int longueurchamp) {
           if (nbCaracteres > 0) {
             minitel.moveCursorLeft(1);
             minitel.print(".");
-            minitel.attributs(CARACTERE_BLANC);
+            minitel.attributs(saisieColor);
             minitel.moveCursorLeft(1);
             userInput = userInput.substring(0, userInput.length() - 1);
             userInputLength--;
@@ -286,12 +293,12 @@ void lectureChampMire(int x, int y, int longueurchamp) {
       case SOMMAIRE:
         {
           fin = true;
-          userInput = "";
-          userInputLength = 0;
           if (currentEcran == "SOMMAIRE") {
             goConfig();
           }
           if (currentEcran == "GUIDE") {
+            userInput = "";
+            userInputLength = 0;
             displayMire();
           }
         }
@@ -319,7 +326,7 @@ void checkService(String input) {
     goAstro();
     return;
   }
-  if (input == "COUPLESPARFAITS" || input == String(SERVICE_CP)) {
+  if (input == "COUPLESPARFAITS" || input == "CP" || input == String(SERVICE_CP)) {
     goCP();
     return;
   }
@@ -351,7 +358,11 @@ void checkService(String input) {
     goPong();
     return;
   }
-  if (input == "TAROTS" || input == String(SERVICE_TAROT)) {
+    if (input == "PPP" || input == String(SERVICE_PPP)) {
+    goPPP();
+    return;
+  }
+  if (input == "TAROT" || input == String(SERVICE_TAROT)) {
     goTarots();
     return;
   }
@@ -397,6 +408,10 @@ void goPendu() {
 void goPong() {
   currentService = SERVICE_PONG;
   setupPong();
+}
+void goPPP() {
+  currentService = SERVICE_PPP;
+  setupPPP();
 }
 void goTarots() {
   currentService = SERVICE_TAROT;

@@ -6,15 +6,16 @@ void setupTarots() {
 }
 void displaySommaireTarots() {
   minitel.newScreen();
+  currentEcran = "SOMMAIRE";
   myObject["currentCard"] = (int)-1;
-  afficheRemoteVDT("tarots/tarots_accueil.vdt", 0, 0);
+  afficheRemoteVDT("tarots/tarots.vdt", 0, 0);
 }
 
 void initTarots() {
   displaySommaireTarots();
   TAROTS_retrieveDatas();
 }
-void hideNavTarotsSuite(){
+void hideNavTarotsSuite() {
   minitel.newXY(19, 24);
   minitel.attributs(CARACTERE_BLANC);
   minitel.attributs(FOND_NORMAL);
@@ -31,31 +32,55 @@ void displayNavTarotsSuite() {
   minitel.attributs(INVERSION_FOND);
   minitel.print(" SUITE ");
 }
-void displayNavTarotsRetour(){
+void displayNavTarotsRetour() {
   minitel.newXY(1, 24);
   minitel.attributs(CARACTERE_MAGENTA);
   minitel.attributs(INVERSION_FOND);
   minitel.print(" RETOUR ");
 }
+void retourneCartes() {
+  minitel.echo(false);
+  currentEcran = "RETOURNEES";
+  effacementEcran(24,24, CARACTERE_NOIR, FOND_NOIR);
+  JSONVar currentArticle = myObject["datas"]["root"]["articles"][0];
+  JSONVar numCard = currentArticle["num"];
+  int nnn = currentArticle["num"];
+  afficheRemoteVDT("tarots/tarot_" + String(nnn) + ".vdt", 3, 1);
+  currentArticle = myObject["datas"]["root"]["articles"][1];
+  numCard = currentArticle["num"];
+  nnn = currentArticle["num"];
+  afficheRemoteVDT("tarots/tarot_" + String(nnn) + ".vdt", 3, 14);
+  currentArticle = myObject["datas"]["root"]["articles"][2];
+  numCard = currentArticle["num"];
+  nnn = currentArticle["num"];
+  afficheRemoteVDT("tarots/tarot_" + String(nnn) + ".vdt", 3, 27);
+   minitel.newXY(2,24);
+  minitel.attributs(CARACTERE_CYAN);
+  minitel.print("Interprétation de votre tirage → ");
+  minitel.attributs(INVERSION_FOND);
+  minitel.print(" SUITE");
+  minitel.attributs(FOND_NORMAL);
+  minitel.echo(true);
+}
 
 void suiteTarots() {
   int currentCard = myObject["currentCard"];
-  if (currentCard < 3) {
-     currentCard++;
-     myObject["currentCard"] = currentCard;
+  if (currentCard < 2) {
+    currentCard++;
+    myObject["currentCard"] = currentCard;
     afficheCarte();
- }
+  }
 }
 void retourTarots() {
   int currentCard = myObject["currentCard"];
   if (currentCard > 0) {
     currentCard--;
     myObject["currentCard"] = currentCard;
-    if(currentCard==1){
+    if (currentCard == 1) {
       displayNavTarotsSuite();
     }
     afficheCarte();
- } else {
+  } else {
     displaySommaireTarots();
   }
 }
@@ -66,9 +91,9 @@ void repetitionTarots() {
   } else {
     afficheRemoteVDT("tarots/tarots_bandeau.vdt", 0, 0);
     displayNavTarotsRetour();
-  if(currentCard<2){
-    displayNavTarotsSuite();
-  }    
+    if (currentCard < 2) {
+      displayNavTarotsSuite();
+    }
     afficheCarte();
   }
 }
@@ -80,14 +105,11 @@ void afficheCarte() {
     displayNavTarotsRetour();
     displayNavTarotsSuite();
   }
-  if(currentCard==2){
+  if (currentCard == 2) {
     hideNavTarotsSuite();
   }
   JSONVar currentArticle = myObject["datas"]["root"]["articles"][currentCard];
-  Serial.println(currentArticle); 
   JSONVar numCard = currentArticle["num"];
-  Serial.println("--carte--");
-  Serial.println(numCard);
   int nnn = currentArticle["num"];
   afficheRemoteVDT("tarots/tarot_" + String(nnn) + ".vdt", 3, 1);
   afficheTexteCurrentCard();
@@ -100,13 +122,8 @@ void afficheTexteCurrentCard() {
   JSONVar thema = myObject["datas"]["root"]["thema"][currentCard];
   minitel.newXY(16, 4);
   minitel.print((const char*)thema);
-  Serial.println(thema);
   JSONVar currentArticle = myObject["datas"]["root"]["articles"][currentCard];
   JSONVar texte = currentArticle["texte"];
-  Serial.println("-----");
-  Serial.println(currentCard);
-  Serial.println(texte);
-  Serial.println(currentArticle["titre"]);
   int nbLines = texte.length();
   int posY = 6;
   for (int j = 0; j < nbLines; j++) {
@@ -124,13 +141,21 @@ void lectureChampTarots(int x, int y, int longueurchamp) {
     touche = minitel.getKeyCode();
     switch (touche) {
       case CONNEXION_FIN:
-        fin=true;
+        fin = true;
         minitel.connexion(false);
         displayMire();
-      break;
+        break;
       case SUITE:
         fin = true;
-        suiteTarots();
+        {
+         Serial.println(currentEcran);
+          if (currentEcran == "SOMMAIRE") {
+            retourneCartes();
+          } else {
+            suiteTarots();
+          }
+        }
+        //
         break;
       case RETOUR:
         fin = true;
@@ -140,9 +165,8 @@ void lectureChampTarots(int x, int y, int longueurchamp) {
         repetitionTarots();
         break;
       case SOMMAIRE:
-      displaySommaireTarots();
-      break;
-
+        displaySommaireTarots();
+        break;
     }
   }
 }
@@ -157,7 +181,6 @@ void TAROTS_retrieveDatas() {
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
       String payload = http.getString();
-      Serial.println(payload);
       JSONVar myJSONObject = JSON.parse(payload);
       if (JSON.typeof(myJSONObject) == "undefined") {
         Serial.println("Parsing input failed!");
