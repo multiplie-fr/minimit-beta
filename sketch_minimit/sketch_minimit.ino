@@ -4,6 +4,7 @@
 #include "FS.h"
 #include <Arduino_JSON.h>
 #include <Minitel1B_Hard.h>  // Voir https://github.com/eserandour/Minitel1B_Hard
+#include <WebSocketsClient.h> // src: https://github.com/Links2004/arduinoWebSockets.git
 Minitel minitel(Serial1);    // Le deuxième port série matériel de l'ATMega 1284P (RXD1 TXD1).
 
 #define SERVICE_MIRE 0
@@ -62,7 +63,7 @@ void displayDemarrage() {
   minitel.noCursor();
   checkScreen(vdt, 0, 0);
   minitel.echo(false);
-  if(isConfig){
+  if (isConfig) {
     ligneZero("Test connexion wifi...");
     isConnected = checkConnexion();
     Serial.println("isConnected");
@@ -70,8 +71,7 @@ void displayDemarrage() {
     delay(3000);
     minitel.echo(true);
     displayMire();
-  }
-  else{
+  } else {
     delay(1000);
     goConfig();
   }
@@ -89,7 +89,7 @@ boolean checkConnexion() {
     //   const char* ssid = "Dogtown";
     //  const char* password = "west100-;";
     const char* ssid = "Livebox-Xine";
-   const char* password = "malakoff";
+    const char* password = "malakoff";
 
     WiFi.begin(ssid, password);
     int cnt = 0;
@@ -139,7 +139,7 @@ void loop() {
       lectureChampCookies(1, 1, 1);
       break;
     case SERVICE_ELIZA:
-      lectureChampEliza(1,4);
+      lectureChampEliza(1, 4);
       break;
     case SERVICE_GALERIE:
       loopGalerie();
@@ -165,6 +165,9 @@ void loop() {
       break;
     case SERVICE_PONG:
       loopPong();
+      break;
+    case SERVICE_TELNET:
+      loopTelnet();
       break;
   }
 }
@@ -330,7 +333,7 @@ void checkService(String input) {
     goCP();
     return;
   }
-   if (input == "ELIZA" || input == String(SERVICE_ELIZA)) {
+  if (input == "ELIZA" || input == String(SERVICE_ELIZA)) {
     goEliza();
     return;
   }
@@ -354,12 +357,16 @@ void checkService(String input) {
     goPendu();
     return;
   }
-   if (input == "PONG" || input == String(SERVICE_PONG)) {
+  if (input == "PONG" || input == String(SERVICE_PONG)) {
     goPong();
     return;
   }
-    if (input == "PPP" || input == String(SERVICE_PPP)) {
+  if (input == "PPP" || input == String(SERVICE_PPP)) {
     goPPP();
+    return;
+  }
+  if (input == "TELNET" || input == String(SERVICE_TELNET)) {
+    goWS();
     return;
   }
   if (input == "TAROT" || input == String(SERVICE_TAROT)) {
@@ -416,6 +423,10 @@ void goPPP() {
 void goTarots() {
   currentService = SERVICE_TAROT;
   setupTarots();
+}
+void goWS() {
+  currentService = SERVICE_TELNET;
+  setupWS();
 }
 void goConfig() {
   currentService = SERVICE_CONFIG;
