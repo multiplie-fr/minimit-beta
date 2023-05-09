@@ -78,7 +78,7 @@ int getLogicalPage(int currentArticle){
   return 0;
 }
 void displayBandeau() {
-  String vdt = "14,0c,1f,41,41,0e,1b,54,20,38,24,20,2c,38,38,30,20,12,43,28,30,20,12,59,1f,42,41,0e,1b,54,20,1b,57,1b,44,4a,1b,54,1b,47,48,1b,57,1b,44,46,1b,54,20,1b,57,4a,12,42,49,1b,54,1b,47,34,1b,57,1b,44,48,1b,54,1b,47,34,1b,57,1b,44,49,4a,29,1b,54,1b,47,24,20,12,57,1f,43,41,0e,1b,54,40,45,2a,38,40,25,1b,57,1b,44,4a,1b,54,1b,47,45,45,25,25,1b,57,1b,44,4a,1b,54,1b,47,45,25,45,24,20,12,57,1f,44,41,0e,1b,44,23,12";
+  String vdt = "14,0c,1f,41,41,0e,1b,54,20,38,24,20,2c,38,38,30,20,12,43,28,30,20,12,59,1f,42,41,0e,1b,54,20,1b,57,1b,44,4a,1b,54,1b,47,48,1b,57,1b,44,46,1b,54,20,1b,57,4a,12,42,49,1b,54,1b,47,34,1b,57,1b,44,48,1b,54,1b,47,34,1b,57,1b,44,49,4a,29,1b,54,1b,47,24,20,12,57,1f,43,41,0e,1b,54,40,45,2a,38,40,25,1b,57,1b,44,4a,1b,54,1b,47,45,45,25,25,1b,57,1b,44,4a,1b,54,1b,47,45,25,45,24,20,12,57,1f,44,41,0e,1b,44,23,12,67";
   checkScreen(vdt, 0, 0);
   minitel.textMode();
 }
@@ -459,9 +459,13 @@ void afficheArticleNextPrevious(int sens) {
   effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
   afficheFolio();
   JSONVar myDatas = myObject["myDatas"];
+  Serial.println("mydatas");
+  Serial.println(myDatas);
   minitel.textMode();
-  JSONVar myarray = myDatas["article"];
-  JSONVar article = (myarray[0]);
+  JSONVar article = myDatas["article"];
+  //JSONVar article = (myarray[0]);
+  Serial.println("--article");
+  Serial.println(article);
   JSONVar texte = article["texte"];
   Serial.println("textelenght");
   Serial.print(texte.length());

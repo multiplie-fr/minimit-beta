@@ -168,7 +168,7 @@ void afficheDatasMETEO() {
   minitel.attributs(GRANDEUR_NORMALE);
   minitel.attributs(FOND_NORMAL);
   //minitel.attributs(FOND_BLEU);
-  minitel.attributs(CARACTERE_BLEU);
+  minitel.attributs(CARACTERE_CYAN);
   minitel.print((const char*)currentweather["dt"]);
   afficheRemoteVDT((const char*)icon + String(".vdt"), 11, 4);
   //

@@ -3,7 +3,7 @@ void setupCP() {
   minitel.newScreen();
   minitel.noCursor();
   wifiConnect();
-  retrieveDatasCP("couplesparfaits/getjson.php");
+  retrieveDatasCP("couplesparfaits/getjsonok.php");
   myObject["proposed"] = "";
   myObject["nbtries"] = 0;
   myObject["nbcouplesok"] = 0;
@@ -26,13 +26,17 @@ void initCP() {
     minitel.moveCursorXY(0, 7 + l);
     minitel.print((const char*)texteKO[l]);
   }
+  afficheBoutonEnvoi();
+}
+void afficheBoutonEnvoi()
+{
   minitel.moveCursorXY(21, 24);
   minitel.attributs(FOND_ROUGE);
   minitel.attributs(INVERSION_FOND);
   minitel.print(" ENVOI ");
   minitel.attributs(FOND_NORMAL);
+  minitel.attributs(FOND_NOIR);
 }
-
 void retrieveDatasCP(String phpFile) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
@@ -107,12 +111,8 @@ void lectureChampCP(int x, int y, int longueurchamp) {
         userInputLength++;
         userInput += char(touche);
         Serial.println(userInput);
-      } else {
-        //minitel.moveCursorLeft(2);
-        //minitel.print(".");
-        //minitel.moveCursorLeft(1);
       }
-    }
+     }
     switch (touche) {
       case CONNEXION_FIN:
         fin=true;
@@ -121,10 +121,16 @@ void lectureChampCP(int x, int y, int longueurchamp) {
         minitel.connexion(false);
         displayMire();
       break;
+
       case SUITE:
-      fin=true;
-      afficheClassement();
+      {
+        if (currentEcran == "FIN"){
+        fin=true;
+        afficheClassement();
+      }
+      }
       break;
+
       case ENVOI:
       {
        if (userInputLength >= longueurchamp) {
@@ -136,14 +142,16 @@ void lectureChampCP(int x, int y, int longueurchamp) {
       }
         break;
       case ANNULATION:
+        afficheBoutonEnvoi();
         champVide(x, y, longueurchamp);
-        userInputLength = 0;
+        
         break;
       case CORRECTION:
         correction();
         break;
     case REPETITION:
       afficheCP();
+      Serial.print("repettion");
       userInput="";
       fin=true;
       userInputLength=0;
@@ -160,24 +168,35 @@ void lectureChampCP(int x, int y, int longueurchamp) {
   }
 }
 void remplitLigne(int num, String couple) {
-  int positions[] = { -1, -1, -1, -1, -1, -1 };
+  Serial.println("num ligne");
+  Serial.println(num);
+  int positions[] = { -1, -1, -1, -1, -1, -1 , -1};
   minitel.attributs(CARACTERE_BLANC);
   JSONVar arraySoluce = myObject["myDatas"]["root"]["linesok"];
   JSONVar arrayUser = myObject["myDatas"]["root"]["linesko"];
   String ligneOK = (const char*)arraySoluce[num];
   String ligneKO = (const char*)arrayUser[num];
+  Serial.println(ligneOK);
+  Serial.println(ligneKO);
   int idx = ligneOK.indexOf(couple);
   positions[0] = idx;
   int counter = 0;
   int absolute_idx = idx;
+  Serial.println("idx");
+  Serial.println(couple);
   while (idx > -1) {
-    idx = ligneOK.indexOf(couple, absolute_idx + 1);
+    idx = ligneOK.indexOf(couple, (absolute_idx + 1));
+    Serial.println("idxboucle");
+    Serial.println(idx);
     if (idx < 0) break;
     counter++;
-    absolute_idx = (absolute_idx + idx);
+    absolute_idx = (idx+1);
     positions[counter] = idx;
+
   }
-  for (int i = 0; i < 6; i++) {
+  Serial.println("positions");
+  //Serial.println(positions);
+  for (int i = 0; i < 7; i++) {
     int index = positions[i];
     char char1 = couple.charAt(0);
     char char2 = couple.charAt(1);
@@ -324,6 +343,7 @@ void CPMessage(String st) {
 }
 void CPScore(int score) {
   minitel.moveCursorXY(2, 22);
+  minitel.attributs(FOND_BLANC);
   minitel.attributs(CARACTERE_ROUGE);
   minitel.print(String(score));
   minitel.print(" essai");
@@ -340,8 +360,5 @@ void CPAuthor(String st, String oe) {
   minitel.print(oe);
 }
 void loopCP() {
-  //Serial.print("loopcp");
-  lectureChampCP(16, 24, 2);
-  //insertCouple(userInput);
-  //userInput = "";
+   lectureChampCP(16, 24, 2);
 }

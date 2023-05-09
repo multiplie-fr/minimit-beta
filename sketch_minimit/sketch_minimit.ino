@@ -31,12 +31,13 @@ JSONVar myObject = {};
 JSONVar myConfig = {};
 int currentService = SERVICE_MIRE;
 String currentEcran = "SOMMAIRE";
-String confFile = "/conf3.txt";
+String confFile = "/conf4.txt";
 int saisieColor = CARACTERE_JAUNE;
 const char* serverName = "https://xn--multipli-i1a.fr/minimit/prod/";
 boolean interruption = false;
 int timeoutAmount = 5000;
 long nextUpdate = 0;
+boolean PONGactive = false;
 
 void setup() {
   Serial.begin(115200);
@@ -84,20 +85,22 @@ boolean checkConnexion() {
     return false;
   } else {
     JSONVar config = myConfig["input"];
-    // const char* ssid = (const char*)config[0];
-    // const char* password = (const char*)config[1];
+    // const char* ssid;
+    // const char* password;
+    const char* ssid = (const char*)config[0];
+    const char* password = (const char*)config[1];
     //   const char* ssid = "Dogtown";
     //  const char* password = "west100-;";
-    const char* ssid = "Livebox-Xine";
-    const char* password = "malakoff";
-
+    // const char* ssid = "Livebox-Xine";
+    // const char* password = "malakoff";
+    WiFi.disconnect();
     WiFi.begin(ssid, password);
     int cnt = 0;
     while (WiFi.status() != WL_CONNECTED) {
-      WiFi.begin(ssid, password);
+      //WiFi.begin(ssid, password);
       delay(1000);
       Serial.println(WiFi.status());
-      if (cnt == 10) {
+      if (cnt == 15) {
         switch (WiFi.status()) {
           case 1:
             ligneZero("Borne wifi non détectée");
@@ -115,6 +118,8 @@ boolean checkConnexion() {
   return true;
 }
 void loop() {
+  //Serial.println("loop");
+  //Serial.println(currentService);
   switch (currentService) {
     case SERVICE_MIRE:
       {
@@ -320,6 +325,7 @@ void lectureChampMire(int x, int y, int longueurchamp) {
 }
 void checkService(String input) {
   ligneZero(" ");
+  input.toUpperCase();
   myObject = (JSONVar){};
   if (input == "ANNUAIRE" || input == String(SERVICE_ANNUAIRE)) {
     goAnnuaire();
@@ -384,7 +390,6 @@ void goAnnuaire() {
   setupAnnuaire();
 }
 void goCP() {
-  Serial.print("cp");
   currentService = SERVICE_CP;
   setupCP();
 }

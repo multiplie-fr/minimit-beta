@@ -3,7 +3,7 @@ void setupPendu() {
   afficheSommairePendu(true,false);
   myObject["current"] = 0;
   myObject["nbMots"] = 0;
-  saisieColor=CARACTERE_BLANC;
+  saisieColor=CARACTERE_NOIR;
 }
 void afficheSommairePendu(boolean firsttime, boolean refresh) {
   currentEcran = "SOMMAIRE";
@@ -52,7 +52,8 @@ void finOK() {
   minitel.repeat(16);
   minitel.newXY(2, 17);
   minitel.textMode();
-  minitel.print("Rejouer : ");
+  minitel.attributs(CARACTERE_NOIR);
+  minitel.print("Rejouer ");
   minitel.attributs(INVERSION_FOND);
   minitel.print(" SOMMAIRE ");
   minitel.noCursor();
@@ -167,7 +168,8 @@ void afficheDatasPENDU() {
   myObject["potence4"] = "1f,4d,43,1f,4a,5d,0e,1b,55,42,1f,4b,5c,0e,1b,55,38,21,1f,4c,5b,0e,1b,55,26,1f,4e,43";
   myObject["potence5"] = "1f,4a,5e,0e,1b,57,1b,45,28,1f,4b,5f,0e,1b,55,29,30,1f,4c,60,0e,1b,55,22,24,1f,48,4b";
   myObject["potence6"] = "1f,4e,5d,0e,1b,55,38,1f,4f,5a,0e,1b,55,40,40,26,1f,50,5b,0e,1b,55,21,1f,49,4b";
-  myObject["potence7"] = "1f,4e,5e,1f,4e,5e,0e,1b,55,29,30,1f,4f,5f,0e,1b,55,22,44,40,1f,50,61,0e,1b,55";
+  myObject["potence7"] = "1f,4e,5e,1f,4e,5e,0e,1b,55,29,30,1f,4f,5f,0e,1b,55,22,44,40,1f,50,61,0e,1b,55,21";
+ 
   myObject["ok"] = 0;
   myObject["ko"] = 0;
   myObject["proposed"] = "";

@@ -6,6 +6,7 @@ void setupGalerie() {
   minitel.echo(false);
   myObject["current"] = 0;
   retrieveDatasGALERIE();
+  retrieveDatasGALERIEPerso();
   afficheSommaireGalerie();
 }
 void afficheSommaireGalerie() {
@@ -57,10 +58,17 @@ void lectureChampGalerie(int x, int y, int longueurchamp) {
         break;
       case ENVOI:
         fin = true;
-        if (userInput == "1") {
+        if(userInput=="1")
+        {
+            myObject["galerieMode"] = "COMMUN" ;        
+        }
+        if(userInput=="2")
+        {
+            myObject["galerieMode"] = "PERSO" ;        
+        }
+        if (userInput == "1" || userInput == "2") {
           currentEcran = "GALERIE";
           nextUpdate=millis()+10;
-          //afficheDatasGALERIE();
           userInput = "";
           userInputLength = 0;
         }
@@ -142,6 +150,36 @@ void retrieveDatasGALERIE() {
       Serial.println("");
       myObject["datas"] = myJSONObject;
       if (JSON.typeof(myObject) == "undefined") {
+        Serial.println("Parsing input failed!");
+        return;
+      }
+      //afficheDatasGALERIE();
+    }
+    // Free resources
+    http.end();
+  } else {
+    Serial.println("WiFi Disconnected");
+  }
+}
+void retrieveDatasGALERIEPerso() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    
+    const char* pseudo = (const char*)myConfig[2];
+    const char* pseudopassword = (const char*)myConfig[3];
+
+    String serverPath = serverName + String("users/get_galerie_from_minimit.php?pseudo=") + pseudo + String("&password=") + pseudopassword;
+    Serial.println(serverPath);
+    http.begin(serverPath.c_str());
+    int httpResponseCode = http.GET();
+    if (httpResponseCode > 0) {
+      String payload = http.getString();
+      JSONVar myJSONObject = JSON.parse(payload);
+      Serial.println("");
+      Serial.print(payload);
+      Serial.println("");
+      myObject["datasperso"] = myJSONObject;
+      if (JSON.typeof(myJSONObject) == "undefined") {
         Serial.println("Parsing input failed!");
         return;
       }
