@@ -10,7 +10,7 @@ void setupLeMonde() {
 
 void initLEMONDE(int currentPage) {
   minitel.newScreen();
- myObject["currentPage"] = currentPage;
+  myObject["currentPage"] = currentPage;
   myObject["currentArticle"] = (int)0;
   myObject["displayMode"] = (int)1;
   //Displaymode
@@ -27,6 +27,7 @@ void resetPagesLEMONDE() {
   myObject["displayMode"] = (int)1;
 }
 void afficheUNELEMONDE(int currentPage) {
+  currentEcran= "SOMMAIRE";
   myObject["format"] = "UNE";
   updateBandeauLEMONDE("UNE");
   displayNavList();
@@ -63,16 +64,14 @@ void sommaireLEMONDE() {
   initLEMONDE(logicalPage);
   afficheUNELEMONDE(logicalPage);
 }
-int getLogicalPage(int currentArticle){
-   JSONVar myDatas = myObject["myDatas"];
+int getLogicalPage(int currentArticle) {
+  JSONVar myDatas = myObject["myDatas"];
   JSONVar myarrayPagesOffset = myDatas["root"]["pages"];
   int n = myarrayPagesOffset.length();
- for(int i = 0; i<n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     int pageoffset = myarrayPagesOffset[i];
-    if (currentArticle < pageoffset)
-    {
-      return i-1;
+    if (currentArticle < pageoffset) {
+      return i - 1;
     }
   }
   return 0;
@@ -112,6 +111,15 @@ void displayNavList() {
   minitel.attributs(CARACTERE_BLANC);
   minitel.print(" ENVOI ");
   minitel.attributs(FOND_NORMAL);
+  if (sformat == "UNE") {
+    minitel.newXY(27, 23);
+    minitel.print(" Infos");
+    minitel.attributs(DEBUT_LIGNAGE);
+    minitel.writeByte(0x20);
+    minitel.attributs(INVERSION_FOND);
+    minitel.print(" GUIDE ");
+    minitel.attributs(FOND_NORMAL);
+  }
   minitel.moveCursorXY(2, 24);
   minitel.attributs(CARACTERE_MAGENTA);
   if (sformat == "UNE") {
@@ -176,9 +184,9 @@ void retourListe() {
 void retourArticle() {
   Serial.println("retourarticle");
   int folioMax = myObject["folioMax"];
-  if (folioMax > 1) {
-    int currentFolio = myObject["currentFolio"];
-    currentFolio++;
+  int currentFolio = myObject["currentFolio"];
+  if (folioMax > 1 && currentFolio>0) {
+    currentFolio--;
     myObject["currentFolio"] = currentFolio;
     afficheArticleNextPrevious(-1);
   } else {
@@ -223,8 +231,23 @@ void previousArticle() {
   retrieveDatasLEMONDE("lemonde/getjson.php?mode=article&item=" + String(currentArticle), 2, currentArticle);
   afficheArticle((int)myObject["displayMode"]);
 }
+void guideLeMonde(){
+  if ((int)myObject["displayMode"] == 1) {
+  if (currentEcran == "GUIDE") {
+    effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
+    afficheUNELEMONDE((int)myObject["currentPage"]);
+  } else {
+    currentEcran = "GUIDE";
+    String vdt = "14,1f,45,41,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,1f,56,41,1b,44,60,12,67,1f,58,41,18,0b,18,1f,45,41,0e,1b,54,20,12,67,1f,46,41,0e,1b,54,20,12,67,1f,47,41,0e,1b,54,20,12,67,1f,48,41,0e,1b,54,20,12,67,1f,49,41,0e,1b,54,20,12,67,1f,4a,41,0e,1b,54,20,12,67,1f,4b,41,0e,1b,54,20,12,67,1f,4c,41,0e,1b,54,20,12,67,1f,4d,41,0e,1b,54,20,12,67,1f,4e,41,0e,1b,54,20,12,67,1f,4f,41,0e,1b,54,20,12,67,1f,50,41,0e,1b,54,20,12,67,1f,51,41,0e,1b,54,20,12,67,1f,52,41,0e,1b,54,20,12,67,1f,53,41,0e,1b,54,20,12,67,1f,54,41,0e,1b,54,20,12,67,1f,55,41,0e,1b,54,20,12,67,1f,46,42,4c,27,61,63,74,75,61,6c,69,74,19,42,65,20,64,27,69,6c,20,79,20,61,20,34,30,20,61,6e,73,20,74,6f,75,74,20,70,69,6c,65,1f,47,42,76,69,65,6e,74,20,64,65,73,20,61,72,63,68,69,76,65,73,20,64,65,20,4c,65,20,4d,6f,6e,64,65,2c,1f,48,42,76,69,73,69,62,6c,65,73,20,69,63,69,20,3a,1f,49,42,6c,65,6d,6f,6e,64,65,2e,66,72,2f,61,72,63,68,69,76,65,73,2d,64,75,2d,6d,6f,6e,64,65,1f,4b,42,56,6f,75,73,20,70,6f,75,72,72,65,7a,20,79,20,6c,69,72,65,20,6c,65,20,64,19,42,65,74,61,69,6c,20,64,65,1f,4c,42,63,68,61,71,75,65,20,61,63,74,75,61,6c,69,74,19,42,65,20,64,6f,6e,74,20,6c,65,20,74,69,74,72,65,1f,4d,42,61,70,70,61,72,61,19,43,69,74,20,69,63,69,2e,1f,4f,42,4e,6f,75,73,20,72,65,6d,65,72,63,69,6f,6e,73,20,4c,65,20,4d,6f,6e,64,65,20,64,65,20,6c,61,20,6d,69,73,65,20,19,41,61,1f,50,42,64,69,73,70,6f,73,69,74,69,6f,6e,20,64,65,20,63,65,73,20,70,72,19,42,65,63,69,65,75,73,65,73,1f,51,42,61,63,74,75,61,6c,69,74,19,42,65,73,20,76,69,6e,74,61,67,65,2e,1f,53,42,46,69,6e,61,6c,65,6d,65,6e,74,2c,20,74,6f,75,74,20,6e,27,61,20,70,61,73,20,74,61,6e,74,20,63,68,61,6e,67,19,42,65,1f,54,42,71,75,65,20,19,4b,63,61,2c,20,76,6f,75,73,20,76,65,72,72,65,7a,2e,1f,58,4c,1b,45,52,65,76,65,6e,69,72,20,19,41,61,20,6c,27,61,63,74,75,61,6c,69,74,19,42,65,20,1b,5d,20,47,55,49,44,45,20,1f,58,41,11";
+    checkScreen(vdt, 0, 0);
+    minitel.noCursor();
+  }
+}
+}
 void lectureChampLeMonde(int x, int y, int longueurchamp) {
+  if(currentEcran != "GUIDE"){
   champVide(x, y, longueurchamp);
+  }
   boolean fin = false;
   while (!fin) {
     touche = minitel.getKeyCode();
@@ -234,8 +257,12 @@ void lectureChampLeMonde(int x, int y, int longueurchamp) {
         userInput += char(touche);
         Serial.print(userInput);
       }
-     }
+    }
     switch (touche) {
+      case GUIDE:
+      guideLeMonde();
+      fin=true;
+      break;
       case CONNEXION_FIN:
         fin = true;
         minitel.connexion(false);
@@ -263,15 +290,16 @@ void lectureChampLeMonde(int x, int y, int longueurchamp) {
 
         break;
       case RETOUR:
-      {
-        Serial.print("retour");
-        if ((int)myObject["currentPage"] == 0) {
-          break;
-        }
-        int displayMode = myObject["displayMode"];
+        {
+          Serial.print("retour");
+          Serial.println(myObject["currentPage"]);
+          int displayMode = myObject["displayMode"];
           switch (displayMode) {
             case 1:
               {
+                if ((int)myObject["currentPage"] == 0) {
+                  break;
+                }
                 retourListe();
                 fin = true;
               }
@@ -283,8 +311,8 @@ void lectureChampLeMonde(int x, int y, int longueurchamp) {
               }
               break;
           }
-      }
-       
+        }
+
         break;
 
 
@@ -368,7 +396,7 @@ void updateBandeauLEMONDE(String format) {
   if (format == "UNE") {
     minitel.moveCursorXY(18, 2);
     minitel.attributs(CARACTERE_CYAN);
-    minitel.print("A LA ");
+    minitel.print(" A LA ");
     minitel.attributs(CARACTERE_BLANC);
     minitel.print("UNE ");
     minitel.attributs(CARACTERE_CYAN);
@@ -399,7 +427,7 @@ void afficheDatasLEMONDE(int currentPage) {
     case 2:
       {
         //myObject["myArticle"] = myObject["myDatas"];
-        myObject["currentPageFolio"] = 0;
+        myObject["currentFolio"] = 0;
         int previousDisplayMode = myObject["previousDisplayMode"];
         afficheArticle(previousDisplayMode);
         break;
@@ -430,23 +458,23 @@ void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
     if (httpResponseCode > 0) {
       String payload = http.getString();
       JSONVar myDatas = JSON.parse(payload);
-
-      if (JSON.typeof(myDatas) == "undefined") {
+     if (JSON.typeof(myDatas) == "undefined") {
         Serial.println(payload);
         Serial.println("Parsing input failed!");
         return;
       } else {
         switch (displayMode) {
-        case 1:
-        myObject["myDatas"] = myDatas;
-        break;
-        case 2:
-        myObject["myArticle"] = myDatas;
-        break;
-      }
+          case 1:
+            myObject["myDatas"] = myDatas;
+            break;
+          case 2:
+            myObject["myArticle"] = myDatas;
+            break;
+        }
       }
     }
-   Serial.print(myObject);
+    Serial.println("myObject");
+    Serial.println(myObject);
     // Free resources
     http.end();
   } else {
@@ -458,11 +486,10 @@ void afficheArticleNextPrevious(int sens) {
   Serial.println("nextprevisou");
   effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
   afficheFolio();
-  JSONVar myDatas = myObject["myDatas"];
-  Serial.println("mydatas");
-  Serial.println(myDatas);
+  JSONVar myDatas = myObject["myArticle"];
   minitel.textMode();
-  JSONVar article = myDatas["article"];
+  JSONVar myarray = myDatas["article"];
+  JSONVar article = (myarray[0]);
   //JSONVar article = (myarray[0]);
   Serial.println("--article");
   Serial.println(article);
@@ -471,10 +498,9 @@ void afficheArticleNextPrevious(int sens) {
   Serial.print(texte.length());
   int lastLineArticle = myObject["lastlineArticle"];
   if (lastLineArticle >= texte.length()) {
-    if (sens==1){
+    if (sens == 1) {
       nextArticle();
-    }
-    else {
+    } else {
       previousArticle();
     }
     return;
@@ -552,7 +578,7 @@ void afficheArticle(int previousDisplayMode) {
     posY++;
     nbLines++;
     if (nbLines == 17) {
-      myObject["lastlineArticle"] = j+1;
+      myObject["lastlineArticle"] = j + 1;
       break;
     }
   }

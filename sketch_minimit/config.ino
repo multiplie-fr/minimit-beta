@@ -249,7 +249,7 @@ void pseudoOK() {
   minitel.attributs(CARACTERE_BLANC);
   minitel.print("Pseudo OK ! ");
   minitel.attributs(INVERSION_FOND);
-  minitel.print(" SUITE ");
+  minitel.print(" SOMMAIRE ");
 }
 void pseudoKO() {
   effacementEcran(18,19, CARACTERE_BLEU, FOND_BLEU);
