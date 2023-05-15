@@ -83,7 +83,7 @@ void lectureChampEliza(int premiereLigne, int nbLignes) {
           wrap_string(char_arrayq);
           char* pq = char_arrayq;
           char* striq;
-          minitel.attributs(CARACTERE_VERT);
+          minitel.attributs(CARACTERE_MAGENTA);
           while ((striq = strtok_r(pq, "+", &pq)) != NULL){  
             minitel.println(striq);
             lastLine++;

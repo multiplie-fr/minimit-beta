@@ -6,6 +6,7 @@
 #include <Minitel1B_Hard.h>  // Voir https://github.com/eserandour/Minitel1B_Hard
 #include <WebSocketsClient.h> // src: https://github.com/Links2004/arduinoWebSockets.git
 Minitel minitel(Serial1, 14, 27);    // Le deuxième port série matériel de l'ATMega 1284P (RXD1 TXD1).
+//Minitel minitel(Serial1);    // Le deuxième port série matériel de l'ATMega 1284P (RXD1 TXD1).
 
 #define SERVICE_MIRE 0
 #define SERVICE_ANNUAIRE 1
@@ -32,7 +33,7 @@ JSONVar myObject = {};
 JSONVar myConfig = {};
 int currentService = SERVICE_MIRE;
 String currentEcran = "SOMMAIRE";
-String confFile = "/conf4.txt";
+String confFile = "/conf5.txt";
 int saisieColor = CARACTERE_JAUNE;
 const char* serverName = "https://xn--multipli-i1a.fr/minimit/prod/";
 boolean interruption = false;
@@ -129,11 +130,7 @@ boolean checkConnexion() {
   return true;
 }
 void loop() {
-  // Serial.println("loop");
-  // Serial.println(currentService);
-
-
-  switch (currentService) {
+ switch (currentService) {
     case SERVICE_MIRE:
       {
         if (currentEcran == "SOMMAIRE") {
@@ -191,18 +188,9 @@ void loop() {
 
 void displayMire() {
   Serial.println("displaymire");
-  // if (minitel.searchSpeed() != 1200) {    // search speed
-  //   if (minitel.changeSpeed(1200) < 0) {  // set to 4800 if different
-  //     minitel.searchSpeed();              // search speed again if change has failed
-  //   }
-  // }
-
-  // int speed;
-  // speed = minitel.changeSpeed(1200);
-  // Serial.println(speed);
-  minitel.aiguillage(true, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
   currentService = SERVICE_MIRE;
   currentEcran = "SOMMAIRE";
+  minitel.aiguillage(true, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
   interruption= false;
   ligneZero(" ");
   saisieColor = CARACTERE_JAUNE;

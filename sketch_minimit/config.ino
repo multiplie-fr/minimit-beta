@@ -102,12 +102,16 @@ void configRetour() {
 void gereTouchesConfig() {
   boolean fin = false;
   while (!fin) {
+    if(currentService==0){
+      fin=true;
+    }
     touche = minitel.getKeyCode();
     if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
-      Serial.println(userInput);
+      Serial.println("geretoucheConfig");
       userInputLength++;
       userInput += char(touche);
       Serial.println(userInput);
+      Serial.println(currentService);
     }
     if(touche!=0)
     {
@@ -115,7 +119,6 @@ void gereTouchesConfig() {
       case CONNEXION_FIN:
         Serial.println("CONNEFIN");
         minitel.connexion(false);
-        fin=true;
         displayMire();
         break;
       case SOMMAIRE:
