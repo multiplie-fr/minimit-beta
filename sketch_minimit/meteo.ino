@@ -24,10 +24,6 @@ void lectureChampMeteo(int x, int y, int longueurchamp) {
         userInputLength++;
         userInput += char(touche);
         Serial.print(userInput);
-      } else {
-        //minitel.moveCursorLeft(1);
-        //minitel.print(" ");
-        //minitel.moveCursorLeft(1);
       }
     }
     switch (touche) {

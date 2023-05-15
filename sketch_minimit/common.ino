@@ -104,16 +104,47 @@ void loopVDT() {
   vdtByteEncours+=3;
 }
 void checkScreen(String s, int offsetY, int offsetX) {
+  Serial.println("checkscreen");
   minitel.noCursor();
   unsigned int str_len = s.length() + 2;
+  Serial.println(str_len);
   int i = 0;
   int positionnement = 0;
   int startpositionnement = -1;
+  lasttouche=0;
+  bool jesors = false;
   for (i = 0; i < str_len; i += 3) {
+
+  //touche = minitel.getKeyCode();
+  //    if(touche==CONNEXION_FIN && lasttouche==CONNEXION_FIN){
+  //     Serial.println("ccccccc2fois");
+  //    minitel.connexion(false);
+  // }
+  //   if (touche == CONNEXION_FIN && lasttouche != CONNEXION_FIN) {
+  //     Serial.println("lalalalFisrt time");
+  //     Serial.println(lasttouche);
+  //     lasttouche=CONNEXION_FIN;
+  //     i=str_len-1;
+  //     minitel.connexion(false);
+  //     displayMire();
+  //     jesors = true;
+  //  }
+  //  else
+  //  {
+  //    lasttouche=0;
+  //  }
+  
+  //   if(jesors){
+  //     break;      
+  //   }
+  // if (getInterruption()==1){
+  //   Serial.println("interruption");
+  //   i=str_len-1;
+  // }
     String myByte = "0x" + s.substring(i, i + 2);
     int val = strtoul(myByte.c_str(), NULL, 16);
     if (positionnement == 1) {
-
+      
       if (i == startpositionnement + 3) {
         val += offsetY;
       }

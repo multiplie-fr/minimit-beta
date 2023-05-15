@@ -115,8 +115,6 @@ void afficheCarte() {
   afficheTexteCurrentCard();
 }
 
-
-
 void afficheTexteCurrentCard() {
   int currentCard = myObject["currentCard"];
   JSONVar thema = myObject["datas"]["root"]["thema"][currentCard];

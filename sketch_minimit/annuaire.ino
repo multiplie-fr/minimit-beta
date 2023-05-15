@@ -1,7 +1,7 @@
 void setupAnnuaire() {
   initAnnuaire();
   afficheAnnuaire();
-}
+ }
 void initAnnuaire() {
   minitel.pageMode();
   wifiConnect();
@@ -258,6 +258,8 @@ void lectureChampAnnuaire() {
     }
 }
 void retrieveDatasANNUAIRE(String phpFile) {
+     minitel.aiguillage(false, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
+
   if (WiFi.status() == WL_CONNECTED) {
     ligneZero("Recherche...");
     HTTPClient http;
@@ -277,8 +279,10 @@ void retrieveDatasANNUAIRE(String phpFile) {
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
       String payload = http.getString();
+       // Free resources
+      http.end();
       JSONVar myDatas = JSON.parse(payload);
-
+      minitel.aiguillage(true, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
       if (JSON.typeof(myDatas) == "undefined") {
         Serial.println(payload);
         Serial.println("Parsing input failed!");
@@ -291,13 +295,7 @@ void retrieveDatasANNUAIRE(String phpFile) {
          myObject["nbPages"] = nbPages;
         }
     }
-
     ligneZero(" ");
-    //Serial.print(myObject);
-    // Free resources
-    http.end();
-  } else {
-    Serial.println("WiFi Disconnected");
-  }
-  ligneZero(" ");
+  
+  } 
 }

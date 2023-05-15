@@ -1,18 +1,23 @@
 int userInputNeeded = 0;
 void setupLeMonde() {
+  minitel.echo(false);
+  Serial.println("currentServiceinemonde");
+  Serial.println(currentService);
   minitel.pageMode();
   minitel.newScreen();
   minitel.textMode();
-  wifiConnect();
   initLEMONDE(0);
   afficheUNELEMONDE(0);
+  myObject["wip"] = false;
 }
 
 void initLEMONDE(int currentPage) {
+  Serial.println("initlemonde");
   minitel.newScreen();
   myObject["currentPage"] = currentPage;
   myObject["currentArticle"] = (int)0;
   myObject["displayMode"] = (int)1;
+  myObject["wip"] = true;
   //Displaymode
   //1 : liste
   //2 : fiche
@@ -27,7 +32,8 @@ void resetPagesLEMONDE() {
   myObject["displayMode"] = (int)1;
 }
 void afficheUNELEMONDE(int currentPage) {
-  currentEcran= "SOMMAIRE";
+  Serial.println("afficheunelemonde");
+  currentEcran = "SOMMAIRE";
   myObject["format"] = "UNE";
   updateBandeauLEMONDE("UNE");
   displayNavList();
@@ -185,7 +191,7 @@ void retourArticle() {
   Serial.println("retourarticle");
   int folioMax = myObject["folioMax"];
   int currentFolio = myObject["currentFolio"];
-  if (folioMax > 1 && currentFolio>0) {
+  if (folioMax > 1 && currentFolio > 0) {
     currentFolio--;
     myObject["currentFolio"] = currentFolio;
     afficheArticleNextPrevious(-1);
@@ -231,26 +237,38 @@ void previousArticle() {
   retrieveDatasLEMONDE("lemonde/getjson.php?mode=article&item=" + String(currentArticle), 2, currentArticle);
   afficheArticle((int)myObject["displayMode"]);
 }
-void guideLeMonde(){
+void guideLeMonde() {
   if ((int)myObject["displayMode"] == 1) {
-  if (currentEcran == "GUIDE") {
-    effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
-    afficheUNELEMONDE((int)myObject["currentPage"]);
-  } else {
-    currentEcran = "GUIDE";
-    String vdt = "14,1f,45,41,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,1f,56,41,1b,44,60,12,67,1f,58,41,18,0b,18,1f,45,41,0e,1b,54,20,12,67,1f,46,41,0e,1b,54,20,12,67,1f,47,41,0e,1b,54,20,12,67,1f,48,41,0e,1b,54,20,12,67,1f,49,41,0e,1b,54,20,12,67,1f,4a,41,0e,1b,54,20,12,67,1f,4b,41,0e,1b,54,20,12,67,1f,4c,41,0e,1b,54,20,12,67,1f,4d,41,0e,1b,54,20,12,67,1f,4e,41,0e,1b,54,20,12,67,1f,4f,41,0e,1b,54,20,12,67,1f,50,41,0e,1b,54,20,12,67,1f,51,41,0e,1b,54,20,12,67,1f,52,41,0e,1b,54,20,12,67,1f,53,41,0e,1b,54,20,12,67,1f,54,41,0e,1b,54,20,12,67,1f,55,41,0e,1b,54,20,12,67,1f,46,42,4c,27,61,63,74,75,61,6c,69,74,19,42,65,20,64,27,69,6c,20,79,20,61,20,34,30,20,61,6e,73,20,74,6f,75,74,20,70,69,6c,65,1f,47,42,76,69,65,6e,74,20,64,65,73,20,61,72,63,68,69,76,65,73,20,64,65,20,4c,65,20,4d,6f,6e,64,65,2c,1f,48,42,76,69,73,69,62,6c,65,73,20,69,63,69,20,3a,1f,49,42,6c,65,6d,6f,6e,64,65,2e,66,72,2f,61,72,63,68,69,76,65,73,2d,64,75,2d,6d,6f,6e,64,65,1f,4b,42,56,6f,75,73,20,70,6f,75,72,72,65,7a,20,79,20,6c,69,72,65,20,6c,65,20,64,19,42,65,74,61,69,6c,20,64,65,1f,4c,42,63,68,61,71,75,65,20,61,63,74,75,61,6c,69,74,19,42,65,20,64,6f,6e,74,20,6c,65,20,74,69,74,72,65,1f,4d,42,61,70,70,61,72,61,19,43,69,74,20,69,63,69,2e,1f,4f,42,4e,6f,75,73,20,72,65,6d,65,72,63,69,6f,6e,73,20,4c,65,20,4d,6f,6e,64,65,20,64,65,20,6c,61,20,6d,69,73,65,20,19,41,61,1f,50,42,64,69,73,70,6f,73,69,74,69,6f,6e,20,64,65,20,63,65,73,20,70,72,19,42,65,63,69,65,75,73,65,73,1f,51,42,61,63,74,75,61,6c,69,74,19,42,65,73,20,76,69,6e,74,61,67,65,2e,1f,53,42,46,69,6e,61,6c,65,6d,65,6e,74,2c,20,74,6f,75,74,20,6e,27,61,20,70,61,73,20,74,61,6e,74,20,63,68,61,6e,67,19,42,65,1f,54,42,71,75,65,20,19,4b,63,61,2c,20,76,6f,75,73,20,76,65,72,72,65,7a,2e,1f,58,4c,1b,45,52,65,76,65,6e,69,72,20,19,41,61,20,6c,27,61,63,74,75,61,6c,69,74,19,42,65,20,1b,5d,20,47,55,49,44,45,20,1f,58,41,11";
-    checkScreen(vdt, 0, 0);
-    minitel.noCursor();
+    if (currentEcran == "GUIDE") {
+      effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
+      afficheUNELEMONDE((int)myObject["currentPage"]);
+    } else {
+      currentEcran = "GUIDE";
+      String vdt = "14,1f,45,41,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,0a,18,1f,56,41,1b,44,60,12,67,1f,58,41,18,0b,18,1f,45,41,0e,1b,54,20,12,67,1f,46,41,0e,1b,54,20,12,67,1f,47,41,0e,1b,54,20,12,67,1f,48,41,0e,1b,54,20,12,67,1f,49,41,0e,1b,54,20,12,67,1f,4a,41,0e,1b,54,20,12,67,1f,4b,41,0e,1b,54,20,12,67,1f,4c,41,0e,1b,54,20,12,67,1f,4d,41,0e,1b,54,20,12,67,1f,4e,41,0e,1b,54,20,12,67,1f,4f,41,0e,1b,54,20,12,67,1f,50,41,0e,1b,54,20,12,67,1f,51,41,0e,1b,54,20,12,67,1f,52,41,0e,1b,54,20,12,67,1f,53,41,0e,1b,54,20,12,67,1f,54,41,0e,1b,54,20,12,67,1f,55,41,0e,1b,54,20,12,67,1f,46,42,4c,27,61,63,74,75,61,6c,69,74,19,42,65,20,64,27,69,6c,20,79,20,61,20,34,30,20,61,6e,73,20,74,6f,75,74,20,70,69,6c,65,1f,47,42,76,69,65,6e,74,20,64,65,73,20,61,72,63,68,69,76,65,73,20,64,65,20,4c,65,20,4d,6f,6e,64,65,2c,1f,48,42,76,69,73,69,62,6c,65,73,20,69,63,69,20,3a,1f,49,42,6c,65,6d,6f,6e,64,65,2e,66,72,2f,61,72,63,68,69,76,65,73,2d,64,75,2d,6d,6f,6e,64,65,1f,4b,42,56,6f,75,73,20,70,6f,75,72,72,65,7a,20,79,20,6c,69,72,65,20,6c,65,20,64,19,42,65,74,61,69,6c,20,64,65,1f,4c,42,63,68,61,71,75,65,20,61,63,74,75,61,6c,69,74,19,42,65,20,64,6f,6e,74,20,6c,65,20,74,69,74,72,65,1f,4d,42,61,70,70,61,72,61,19,43,69,74,20,69,63,69,2e,1f,4f,42,4e,6f,75,73,20,72,65,6d,65,72,63,69,6f,6e,73,20,4c,65,20,4d,6f,6e,64,65,20,64,65,20,6c,61,20,6d,69,73,65,20,19,41,61,1f,50,42,64,69,73,70,6f,73,69,74,69,6f,6e,20,64,65,20,63,65,73,20,70,72,19,42,65,63,69,65,75,73,65,73,1f,51,42,61,63,74,75,61,6c,69,74,19,42,65,73,20,76,69,6e,74,61,67,65,2e,1f,53,42,46,69,6e,61,6c,65,6d,65,6e,74,2c,20,74,6f,75,74,20,6e,27,61,20,70,61,73,20,74,61,6e,74,20,63,68,61,6e,67,19,42,65,1f,54,42,71,75,65,20,19,4b,63,61,2c,20,76,6f,75,73,20,76,65,72,72,65,7a,2e,1f,58,4c,1b,45,52,65,76,65,6e,69,72,20,19,41,61,20,6c,27,61,63,74,75,61,6c,69,74,19,42,65,20,1b,5d,20,47,55,49,44,45,20,1f,58,41,11";
+      checkScreen(vdt, 0, 0);
+      minitel.noCursor();
+    }
   }
 }
+void loopLeMonde() {
+  setupLeMonde();
+  lectureChampLeMonde(13, 23, 3);
 }
 void lectureChampLeMonde(int x, int y, int longueurchamp) {
-  if(currentEcran != "GUIDE"){
-  champVide(x, y, longueurchamp);
+  // setupLeMonde();
+  //if(wip)return;
+  if (currentEcran != "GUIDE") {
+    champVide(x, y, longueurchamp);
   }
   boolean fin = false;
   while (!fin) {
     touche = minitel.getKeyCode();
+    lasttouche = touche;
+    //Serial.println("lecturechamplemonde");
+    if (touche != 0) {
+      Serial.println("touchelemonde");
+      Serial.println(touche);
+    }
     if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
       if (userInput.length() < longueurchamp) {
         userInputNeeded++;
@@ -258,12 +276,14 @@ void lectureChampLeMonde(int x, int y, int longueurchamp) {
         Serial.print(userInput);
       }
     }
+    //if(touche==lasttouche)return;
     switch (touche) {
       case GUIDE:
-      guideLeMonde();
-      fin=true;
-      break;
+        guideLeMonde();
+        fin = true;
+        break;
       case CONNEXION_FIN:
+        Serial.println("connfinlemonde");
         fin = true;
         minitel.connexion(false);
         displayMire();
@@ -353,6 +373,7 @@ void lectureChampLeMonde(int x, int y, int longueurchamp) {
         }
         break;
       case SOMMAIRE:
+        Serial.println("sommairelemn");
         fin = true;
         userInput = "";
         userInputLength = 0;
@@ -436,6 +457,7 @@ void afficheDatasLEMONDE(int currentPage) {
 }
 
 void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
+  minitel.aiguillage(false, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
   ligneZero("Recherche...");
   int previousDisplayMode = myObject["displayMode"];
   myObject["previousDisplayMode"] = previousDisplayMode;
@@ -455,12 +477,14 @@ void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
     }
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
+    Serial.println("response");
     if (httpResponseCode > 0) {
       String payload = http.getString();
+      minitel.aiguillage(true, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
+      // Free resources
+      http.end();
       JSONVar myDatas = JSON.parse(payload);
-     if (JSON.typeof(myDatas) == "undefined") {
-        Serial.println(payload);
-        Serial.println("Parsing input failed!");
+      if (JSON.typeof(myDatas) == "undefined") {
         return;
       } else {
         switch (displayMode) {
@@ -472,15 +496,11 @@ void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
             break;
         }
       }
+      Serial.println("myObject");
+      Serial.println(myObject);
+      ligneZero(" ");
     }
-    Serial.println("myObject");
-    Serial.println(myObject);
-    // Free resources
-    http.end();
-  } else {
-    Serial.println("WiFi Disconnected");
   }
-  ligneZero(" ");
 }
 void afficheArticleNextPrevious(int sens) {
   Serial.println("nextprevisou");
@@ -589,8 +609,6 @@ void afficheListe(int page) {
   minitel.textMode();
   JSONVar myarray = myDatas["root"]["articles"];
   JSONVar myarrayPagesOffset = myDatas["root"]["pages"];
-  Serial.println("mydataspagesoffset");
-  Serial.println(myarrayPagesOffset);
   //Serial.println()
   int nbArticles = (int)myarrayPagesOffset[(page + 1)] - (int)myarrayPagesOffset[(page)];
   nbArticles += (int)myarrayPagesOffset[(page)];

@@ -3,7 +3,7 @@
 #define MINITEL_PORT Serial1 //for ESP32
 //#define MINITEL_PORT Serial1 //for Leonardo
 
-#define DEBUG true
+#define DEBUG false
 #define DEBUG_PORT Serial
  
 #if DEBUG // Debug enabled
@@ -151,10 +151,10 @@ void welcome() {
   //flush any input
   while(MINITEL_PORT.available()) {
     byte b = MINITEL_PORT.read();
-    debugPrint(b);
+    //debugPrint(b);
   }
   //wait touch is pressed
-  Serial.println(getKeyCodeOverride());
+  //Serial.println(getKeyCodeOverride());
   while(getKeyCodeOverride() != 65) {
     delay(10);
   }
@@ -170,17 +170,19 @@ void startGame() {
   
   //draw game field
   drawGameField();
-  debugPrint("game field done");
+  Serial.println("game field done");
   //init game parameters
   initGame();
-  debugPrint("init game done");
+  Serial.println("init game done");
   //start
   while (PONGactive){
     while (p1+p2 < NBALL) {
       touche = minitel.getKeyCode();
-    if (touche == CONNEXION_FIN) {
+      if (touche == CONNEXION_FIN) {
       Serial.println("jesors");
       PONGactive = false;
+      int speed;
+      speed = minitel.changeSpeed(4800);
       minitel.connexion(false);
       displayMire();
       return;
@@ -221,26 +223,28 @@ void handlePlayer() {
   
   
 
-  byte key = getKeyCodeOverride();
+  long unsigned key = minitel.getKeyCode();
+   //Serial.println(touche);
   //Serial.println(key);
   //if (key == 215 && yP1<22) dy1++; //W
-  if (key == 87 && yP1<22) dy1++;
+  if (key == 87 && yP1<22){Serial.println("iciW");dy1++;} 
   //if (key == 209 && yP1>3) dy1--;Q
-  if (key == 81 && yP1>3) dy1--;
-  if (key == 78 && yP2<22) dy2++;
+  if (key == 81 && yP1>3) {Serial.println("iciQ");dy1--;} 
+  if (key == 78 && yP2<22) {Serial.println("iciN");dy2++;} 
  // if (key == 202 && yP2>3) dy2--;
-  if (key == 74 && yP2>3) dy2--;
+  if (key == 74 && yP2>3) {Serial.println("iciJ");dy2--;} 
   
+
   minitel.graphic(0b111111, X1, yP1+3*dy1);
   minitel.moveCursorXY(X1, yP1-2*dy1);
   if (dy1!=0) minitel.graphic(0b000000);
-  else minitel.graphic(0b111111); //preserve frame rate
+  //else minitel.graphic(0b111111); //preserve frame rate
   yP1+=dy1;
 
   minitel.graphic(0b111111, X2, yP2+3*dy2);
   minitel.moveCursorXY(40, yP2-2*dy2);
   if (dy2!=0) minitel.graphic(0b000000);
-  else minitel.graphic(0b111111); //preserve frame rate
+  //else minitel.graphic(0b111111); //preserve frame rate
   yP2+=dy2;
   
 }
@@ -462,7 +466,7 @@ byte getKeyCodeOverride() {
     MINITEL_PORT.flush(); 
     // Serial.println("bbbb");
     // Serial.println(b) ;
-    debugPrint(b);
+    //debugPrint(b);
   }
   return b;
 }
