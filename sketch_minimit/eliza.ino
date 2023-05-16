@@ -15,10 +15,13 @@ void displayInterface() {
   currentEcran="DIALOGUE";
   minitel.moveCursorXY(1, 3);
   minitel.attributs(CARACTERE_MAGENTA);
-  minitel.writeByte(0x60);
-  minitel.repeat(32);
+  // minitel.writeByte(0x60);
+  // minitel.repeat(32);
   minitel.attributs(INVERSION_FOND);
-  minitel.print(" ENVOI ");
+  minitel.print(" Confiez-vous à Eliza ");
+   minitel.writeByte(0x60);
+   minitel.repeat(9);
+  minitel.print("→ ENVOI ");
   minitel.attributs(FOND_NORMAL);
  }
 void champVideEliza(int premiereLigne, int nbLignes) {

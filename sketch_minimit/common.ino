@@ -219,12 +219,12 @@ void effacementEcran(int y1, int y2, int attribut1, int attribut2) {
   minitel.textMode();
 }
 void ligneZero(String message) {
-  int mx = minitel.getCursorX();
-  int my = minitel.getCursorY();
-  minitel.newXY(1, 0);
-  minitel.print(" ");
-  minitel.repeat(30);
-  minitel.newXY(1, 0);
-  minitel.print(message);
-  minitel.newXY(mx, my);
+  // int mx = minitel.getCursorX();
+  // int my = minitel.getCursorY();
+  // minitel.newXY(1, 0);
+  // minitel.print(" ");
+  // minitel.repeat(30);
+  // minitel.newXY(1, 0);
+  // minitel.print(message);
+  // minitel.newXY(mx, my);
 }

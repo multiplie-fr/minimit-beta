@@ -383,7 +383,7 @@ void lectureChampLeMonde(int x, int y, int longueurchamp) {
         fin = true;
         userInput = "";
         userInputLength = 0;
-        champVide(x, y, longueurchamp);
+        // champVide(x, y, longueurchamp);
         break;
       case CORRECTION:
         {
