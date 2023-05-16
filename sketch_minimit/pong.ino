@@ -194,7 +194,7 @@ void startGame() {
       Serial.println("jesors");
       PONGactive = false;
       int speed;
-      speed = minitel.changeSpeed(4800);
+      speed = minitel.changeSpeed(1200);
       minitel.connexion(false);
       displayMire();
       return;
