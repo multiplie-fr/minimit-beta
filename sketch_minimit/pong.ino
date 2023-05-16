@@ -175,7 +175,19 @@ void startGame() {
   initGame();
   Serial.println("init game done");
   //start
-  while (PONGactive){
+  // if(p1+p2>=NBALL)
+  // {
+  //   delay(1000);
+  //    p1 = 0;
+  // p2 = 0;
+  // yP1 = 13;
+  // yP2 = 13;
+  // xBall = 0;
+  // yBall = 0;
+  // ping = true;
+  //   welcome();
+  //   PONGactive=true;
+  // }
     while (p1+p2 < NBALL) {
       touche = minitel.getKeyCode();
       if (touche == CONNEXION_FIN) {
@@ -189,7 +201,7 @@ void startGame() {
     }
       playGame();
     }
-  }
+  
   minitel.attributs(CLIGNOTEMENT);
   if (p1>p2) drawScore1(p1);
   else drawScore2(p2);
@@ -205,7 +217,8 @@ void startGame() {
 // #ifdef SOUND2
 //   if (!ping) ping = pingpong(ping);
 // #endif
-
+  Serial.println("ici");
+  delay(8000);
   p1 = 0;
   p2 = 0;
   yP1 = 13;
@@ -213,20 +226,15 @@ void startGame() {
   xBall = 0;
   yBall = 0;
   ping = true;
-  
+  PONGactive=true;
+  //welcome();
 }
 
 void handlePlayer() {
 
   int dy1 = 0;
   int dy2 = 0;
-  
-  
-
   long unsigned key = minitel.getKeyCode();
-   //Serial.println(touche);
-  //Serial.println(key);
-  //if (key == 215 && yP1<22) dy1++; //W
   if (key == 87 && yP1<22){Serial.println("iciW");dy1++;} 
   //if (key == 209 && yP1>3) dy1--;Q
   if (key == 81 && yP1>3) {Serial.println("iciQ");dy1--;} 
