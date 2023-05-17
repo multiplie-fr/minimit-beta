@@ -1,97 +1,49 @@
+// ASTROLOGIE
+
+// SETUP du service
 void setupAstro() {
-  minitel.pageMode();
-  wifiConnect();
+  Serial.println("setup Astro");
+  initMinitelService();
+  wifiConnect();  
   afficheSommaireAstro();
 }
-void afficheSommaireAstro() {
-  currentEcran = "SOMMAIRE";
-  minitel.newScreen();
-  afficheRemoteVDT("astro/astro.vdt", 0, 0);
-}
-void lectureChampAstro(int x, int y, int longueurchamp) {
-  if (currentEcran == "SOMMAIRE") {
-    champVide(x, y, longueurchamp);
-  }
-  boolean fin = false;
-  while (!fin) {
-    touche = minitel.getKeyCode();
-    if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
-      if (userInputLength < longueurchamp) {
-        userInputLength++;
-        userInput += char(touche);
-        Serial.print(userInput);
-      }
-     }
+
+
+// LOOP du service
+void loopAstro() {
+  Serial.println("loop Astro");
+
+  while (1) {
+
+    // Input
+    wait_for_user_action();
+
+    // Traitement de l'action utilisateur (maj des variables globales dans wait_for___)
     switch (touche) {
-      case CONNEXION:
-      Serial.println("CONNEXION");
-      break;
-      case CONNEXION_FIN:
-        Serial.println("connnefinastro");
-        interruption=true;
-        fin=true;      
-        userInput = "";
-        userInputLength = 0;
-        minitel.connexion(false);
-        displayMire();
-      break;
-      case ENVOI:
-        fin = true;
-        if (userInputLength == 3) {
-          retrieveDatasASTRO();
-          userInput = "";
-          userInputLength = 0;
-        }
-        break;
-      case ANNULATION:
-        champVide(x, y, longueurchamp);
-        userInput = "";
-        userInputLength = 0;
-        break;
-      case CORRECTION:
-        {
-          int nbCaracteres = userInput.length();
-          if (nbCaracteres > 0) {
-            minitel.moveCursorLeft(1);
-            minitel.print(".");
-            minitel.attributs(CARACTERE_BLANC);
-            minitel.moveCursorLeft(1);
-            userInput = userInput.substring(0, userInput.length() - 1);
-            userInputLength--;
-            Serial.println(userInput);
-          }
-        }
-        break;
-      case REPETITION:
-        {
-        // String page = (const char*)myObject["currentPage"];
-         if(currentEcran=="SOMMAIRE"){
-          champVide(x, y, longueurchamp);
-          userInput = "";
-          userInputLength = 0;
-          }
-         else {
-          afficheRemoteVDT("astro/bandeau-astro.vdt", 0, 0);
-          afficheDatasASTRO();
-         }
-        }
-        break;
-      case SOMMAIRE:
-      case RETOUR:
-        {
-          if (currentEcran=="PAGE")
-          {
-            afficheSommaireAstro();
-            userInput = "";
-            userInputLength = 0;
-        }
-        }
-        break;
+		
+		// SI CONNEXION FIN on sort de la loop, on revient à la loop principale
+		case CONNEXION_FIN:
+			Serial.println("CONNEXION_FIN");
+			return;
+		break;
+
+		// SI ENVOI on affiche la page du signe
+		case ENVOI:
+			Serial.println("ENVOI "+userInput);
+			  retrieveDatasASTRO();
+			  afficheDatasASTRO();
+		break;
+
+		// SI RETOUR ON AFFICHE LE SOMMAIRE
+		case RETOUR:
+			afficheSommaireAstro();
+		break;
     }
   }
 }
+// FIN LOOP
 
-
+// Fonctions d'affichage et de traitement liées au service
 void afficheDatasASTRO() {
   currentEcran = "PAGE";
   minitel.noCursor();
@@ -153,7 +105,6 @@ void retrieveDatasASTRO() {
         Serial.println("Parsing input failed!");
         return;
       }
-      afficheDatasASTRO();
     }
     // Free resources
     http.end();
@@ -161,3 +112,7 @@ void retrieveDatasASTRO() {
     Serial.println("WiFi Disconnected");
   }
 }
+void afficheSommaireAstro() {
+  afficheRemoteVDT("astro/astro.vdt", 0, 0);
+}
+

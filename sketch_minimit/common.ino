@@ -1,3 +1,38 @@
+
+
+// fonction à mettre dans common
+void wait_for_user_action() {
+    userInput = "";
+	  while(1) {
+      touche = minitel.getKeyCode();
+
+    // saisie de la commande / signe
+    if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
+        userInput += char(touche);
+        Serial.println(userInput);
+     }
+    if ((touche == CONNEXION_FIN) || (touche == RETOUR) || (touche == ENVOI)) return; // TODO mettre toutes les touches
+
+    } // fin boucle while
+
+}
+
+// init du Minitel a effectuer avant chaque service
+void initMinitelService() {
+  minitel.pageMode();
+  minitel.newScreen();
+}
+
+
+
+//
+
+
+
+
+
+
+
 void champVide(int x, int y, int longueurchamp) {
   minitel.textMode();
   minitel.noCursor();
@@ -17,8 +52,14 @@ void wifiConnect() {
   if (WiFi.status() == WL_CONNECTED) return;
 
   JSONVar config = myConfig["input"];
-  const char* ssid = (const char*)config[0];
-  const char* password = (const char*)config[1];
+  //const char* ssid = (const char*)config[0];
+  //const char* password = (const char*)config[1];
+
+// HACK
+
+  const char* ssid = "Dogtown";
+  const char* password = "west100-;";
+
 
   WiFi.begin(ssid, password);
   Serial.print(ssid);
@@ -107,7 +148,6 @@ void checkScreen(String s, int offsetY, int offsetX) {
   Serial.println("checkscreen");
   minitel.noCursor();
   unsigned int str_len = s.length() + 2;
-  Serial.println(str_len);
   int i = 0;
   int positionnement = 0;
   int startpositionnement = -1;
