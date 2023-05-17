@@ -88,6 +88,23 @@ void launchService(String minimit_service) {
 	  loopTarots();
     return;
   }
+ if (minimit_service == "LEMONDE") {
+    setupLeMonde();
+	  loopLeMonde();
+    return;
+  }
+
+  if (minimit_service == "PENDU") {
+    setupPendu();
+	  loopPendu();
+    return;
+    }
+   if (minimit_service == "ELIZA") {
+    setupEliza();
+	  loopEliza();
+    return;
+    }
+  
 
 }
 
