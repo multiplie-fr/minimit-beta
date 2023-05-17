@@ -87,6 +87,11 @@ void launchService(String minimit_service) {
 	  loopCookies();
     return;
   }
+  if (minimit_service == "TAROT") {
+    setupTarots();
+	  loopTarots();
+    return;
+  }
 
 }
 
