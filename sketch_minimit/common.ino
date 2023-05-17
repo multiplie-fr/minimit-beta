@@ -2,6 +2,9 @@
 
 // On attend que l'utilisateur appuie a minima sur une touche de fonction
 void wait_for_user_action() {
+
+    Serial.println("wait_for_user_action");
+
     // on met bien l'echo au cas où il aurait disparu
     minitel.echo(true);
 
@@ -16,7 +19,9 @@ void wait_for_user_action() {
      }
     
     // traitement du cas de CONNEXION_FIN à cause du 40 secondes
-    if (touche == CONNEXION_FIN) minitel.connexion(false);
+    if (touche == CONNEXION_FIN) {
+      Serial.println("CONNEXION_FIN");
+    }
 
     // retour ...
     if ((touche == CONNEXION_FIN) || (touche == SOMMAIRE) || (touche == ANNULATION) || (touche == RETOUR) || (touche == REPETITION) || (touche == GUIDE) || (touche == CORRECTION) || (touche == SUITE) || (touche == ENVOI)) return;
