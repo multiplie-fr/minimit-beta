@@ -82,6 +82,11 @@ void launchService(String minimit_service) {
 	  loopAstro();
     return;
   }
+  if (minimit_service == "FORTUNE") {
+    setupCookies();
+	  loopCookies();
+    return;
+  }
 
 }
 
