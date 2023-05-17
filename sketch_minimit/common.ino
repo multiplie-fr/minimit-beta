@@ -9,12 +9,14 @@ void wait_for_user_action() {
     minitel.echo(true);
 
     userInput = "";
+    userInputLength=0;
 	  while(1) {
       touche = minitel.getKeyCode();
 
     // saisie de la commande / signe
     if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
         userInput += char(touche);
+        userInputLength++;
         Serial.println(userInput);
      }
     

@@ -104,6 +104,11 @@ void launchService(String minimit_service) {
 	  loopEliza();
     return;
     }
+   if (minimit_service == "COUPLESPARFAITS") {
+    setupCP();
+	  loopCP();
+    return;
+    }
   
 
 }
