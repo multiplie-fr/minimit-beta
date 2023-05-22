@@ -44,6 +44,7 @@ String currentService;//le minimit service courant, voir si ca sert encore
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("**** Minimit is launching");
   minitel.aiguillage(true, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
   minitel.pageMode();
   minitel.noCursor();
@@ -51,7 +52,7 @@ void setup() {
   minitel.changeSpeed(1200);
   SPIFFS.begin(true);
   displayDemarrage();
-  //init_and_displayMire();
+  init_and_displayMire(0);
 }
 //AFFICHAGE LOGO MINIMIT
 
@@ -61,7 +62,8 @@ void setup() {
 // en fonction de ça elle lance via launchService les différentes services, que ce soit GUIDE ou Astro ...
 
 void loop() {
-  Serial.println("loop");
+    Serial.println(__func__);
+
     champVide(12, 17, 29);
 		wait_for_user_action();
     // GESTION TOUCHE CMD
@@ -71,13 +73,13 @@ void loop() {
         {
           int isConnexionNeeded = launchService(userInput);
           if(isConnexionNeeded==1){
-            ligneZeroSafe("Connexion wifi nécessaire");
+            ligneZeroSafe("Ce service nécessite malheureusement une connexion à Internet.");
             delay(2000);
             ligneZeroSafe(" ");
             return;
           }
           if(isConnexionNeeded==2){
-              ligneZeroSafe("Service inconnu");
+              ligneZeroSafe("Ce service nous est inconnu.");
               delay(2000);
               ligneZeroSafe(" ");
               return;
@@ -110,7 +112,6 @@ void loop() {
             minitel.moveCursorLeft(1);
             userInput = userInput.substring(0, userInput.length() - 1);
             userInputLength--;
-            Serial.println(userInput);
           }
         }
         break;
@@ -123,12 +124,13 @@ void loop() {
 // généralement parce qu'il y a eu un CNX/FIN
 
 int launchService(String minimit_service) {
+    Serial.println(__func__);
+
   myObject = (JSONVar){};
   
   minimit_service.toUpperCase();
 
-  Serial.println("minimit_service");
-  Serial.println(minimit_service);
+  Serial.println("Launch service "+minimit_service);
 
    if (minimit_service == "ANNUAIRE" || minimit_service == "1") {
     if(!isConnected)
@@ -271,15 +273,17 @@ int launchService(String minimit_service) {
 // j'ajoute init parce que l'idée est dêtre sur que les paramètres sont bien rétablis
 // au cas où des services ont fait n'importe quoi
 void init_and_displayMire(boolean deconnecter) {
+    Serial.println(__func__);
+
   currentService="";
   //minitel.connexion(false); // Si je mets ca la, ca s'arrete quand on vient de demarrage et qu'on est pas connecté  
   if(deconnecter)
   {
-    minitel.connexion(false);
+    Serial.println("init_and_displayMire minitel.connexion(false)");
+    //minitel.connexion(false);
   }
   saisieColor=CARACTERE_JAUNE;
   minitel.attributs(CARACTERE_JAUNE);
-  Serial.println("init_and_displayMire");
 
   minitel.aiguillage(true, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
   minitel.pageMode();

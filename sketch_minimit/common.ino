@@ -1,5 +1,7 @@
 // fonction à mettre dans common
 void wait_for_user_action() {
+    Serial.println(__func__);
+
   userInput = "";
   while (1) {
     if (currentEcran == "GALERIE") {
@@ -8,14 +10,18 @@ void wait_for_user_action() {
 
     touche = minitel.getKeyCode();
 
+    if (touche) Serial.println(touche);
+
     // saisie de la commande
     if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
       userInput += char(touche);
       userInputLength++;
-      // Serial.println("userInput from wait_for-user_action");
-      // Serial.println(userInput);
     }
-    if ((touche == CONNEXION_FIN) || (touche == SOMMAIRE) || (touche == ANNULATION) || (touche == RETOUR) || (touche == REPETITION) || (touche == GUIDE) || (touche == CORRECTION) || (touche == SUITE) || (touche == ENVOI)) return;  // TODO mettre toutes les touches
+    if ((touche == CONNEXION_FIN) || (touche == SOMMAIRE) || (touche == ANNULATION) || (touche == RETOUR) || (touche == REPETITION) || (touche == GUIDE) || (touche == CORRECTION) || (touche == SUITE) || (touche == ENVOI)) {
+      Serial.println("sortie de wait_for_user_action userInput puis touche "+userInput);
+      Serial.println(touche);
+      return;
+    } 
   }
   // fin boucle while
 }
@@ -44,6 +50,8 @@ void champVide(int x, int y, int longueurchamp) {
 }
 
 void wifiConnect() {
+      Serial.println(__func__);
+
   if (WiFi.status() == WL_CONNECTED) return;
 
   JSONVar config = myConfig["input"];
@@ -160,7 +168,7 @@ void loopVDT() {
   //}
 }
 void checkScreen(String s, int offsetY, int offsetX) {
-  Serial.println("checkscreen");
+
   minitel.noCursor();
   unsigned int str_len = s.length() + 2;
   int i = 0;
