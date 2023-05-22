@@ -118,9 +118,9 @@ void displayInterface() {
   // minitel.writeByte(0x60);
   // minitel.repeat(32);
   minitel.attributs(INVERSION_FOND);
-  minitel.print(" Confiez-vous à Eliza ");
+  minitel.print(" Speak to Eliza ");
   minitel.writeByte(0x60);
-  minitel.repeat(9);
+  minitel.repeat(14);
   minitel.print("→ ENVOI ");
   minitel.attributs(FOND_NORMAL);
 }
