@@ -1,9 +1,8 @@
 #include <Minitel1B_Hard.h>
 
-#define MINITEL_PORT Serial1 //for ESP32
-//#define MINITEL_PORT Serial1 //for Leonardo
+#define MINITEL_PORT Serial1
 
-#define DEBUG false
+#define DEBUG true
 #define DEBUG_PORT Serial
  
 #if DEBUG // Debug enabled
@@ -19,7 +18,7 @@
 #endif
 
 // SOUND FX
-//#define SOUND 1 // score using bip
+#define SOUND 1 // score using bip
 //#define SOUND2 1 // hit using modem connection
 
 // SCREEN SIZE
@@ -50,7 +49,7 @@
 #define BAS_GAUCHE 3
 #define HAUT_GAUCHE 4
 
-//Minitel minitel(Serial1, 14, 27);
+//Minitel minitel(MINITEL_PORT, 14, 27);
 
 int yP1 = 13; //player1 position
 int yP2 = 13; //player2 position
@@ -96,26 +95,24 @@ const prog_uchar IMAGE[] PROGMEM = {0x0C,0x0E,0x1B,0x40,0x1B,0x50,0x7F,0x7F,0x7F
 
 
 void setupPong() {
-  minitel.newScreen();
-  PONGactive = true;
+
+  debugBegin(115200);
+  debugPrint("debug port ready");
+  
   delay(500); // wait minitel to init
   
   //init minitel at 4800 bauds
-  
   if (minitel.searchSpeed() != 4800) {     // search speed
     if (minitel.changeSpeed(4800) < 0) {   // set to 4800 if different
       minitel.searchSpeed();               // search speed again if change has failed
     }
   }
 
-
-int speed;
-speed = minitel.changeSpeed(4800);
-  debugPrint(speed);
-
   minitel.modeVideotex();
+
   minitel.echo(false);
- }
+
+}
 
 void loopPong() {
   welcome();
@@ -151,16 +148,12 @@ void welcome() {
   //flush any input
   while(MINITEL_PORT.available()) {
     byte b = MINITEL_PORT.read();
-    //debugPrint(b);
+    debugPrint(b);
   }
   //wait touch is pressed
-  //while(getKeyCodeOverride() != 65 || getKeyCodeOverride()!=89) {
-  while(getKeyCodeOverride() != 65) {
+  while(minitel.getKeyCode() != 0x1341) { // code touche ENVOI
     delay(10);
   }
-
-  
- 
   
   //clean up
   minitel.newScreen();
@@ -173,52 +166,30 @@ void startGame() {
   
   //draw game field
   drawGameField();
-  Serial.println("game field done");
+  debugPrint("game field done");
   //init game parameters
   initGame();
-  Serial.println("init game done");
+  debugPrint("init game done");
   //start
-  // if(p1+p2>=NBALL)
-  // {
-  //   delay(1000);
-  //    p1 = 0;
-  // p2 = 0;
-  // yP1 = 13;
-  // yP2 = 13;
-  // xBall = 0;
-  // yBall = 0;
-  // ping = true;
-  //   welcome();
-  //   PONGactive=true;
-  // }
-    while (p1+p2 < NBALL) {
-      touche = minitel.getKeyCode();
-      if (touche == CONNEXION_FIN) {
-      PONGactive = false;
-      int speed;
-      speed = minitel.changeSpeed(1200);
-      return;
-    }
-      playGame();
-    }
-  
+  while (p1+p2 < NBALL) {
+    playGame();
+  }
   minitel.attributs(CLIGNOTEMENT);
   if (p1>p2) drawScore1(p1);
   else drawScore2(p2);
-// #ifdef SOUND
-//   minitel.bip();
-//   delay(1000);
-//   minitel.bip();
-//   delay(1000);
-//   minitel.bip();
-//   delay(1000);
-// #else delay(5000);
-// #endif
-// #ifdef SOUND2
-//   if (!ping) ping = pingpong(ping);
-// #endif
-  Serial.println("ici");
-  delay(8000);
+#ifdef SOUND
+  minitel.bip();
+  delay(1000);
+  minitel.bip();
+  delay(1000);
+  minitel.bip();
+  delay(1000);
+#else delay(5000);
+#endif
+#ifdef SOUND2
+  if (!ping) ping = pingpong(ping);
+#endif
+
   p1 = 0;
   p2 = 0;
   yP1 = 13;
@@ -226,33 +197,31 @@ void startGame() {
   xBall = 0;
   yBall = 0;
   ping = true;
-  PONGactive=true;
-  //welcome();
+  
 }
 
 void handlePlayer() {
 
   int dy1 = 0;
   int dy2 = 0;
-  long unsigned key = minitel.getKeyCode();
-  if (key == 87 && yP1<22){Serial.println("iciW");dy1++;} 
-  //if (key == 209 && yP1>3) dy1--;Q
-  if (key == 81 && yP1>3) {Serial.println("iciQ");dy1--;} 
-  if (key == 78 && yP2<22) {Serial.println("iciN");dy2++;} 
- // if (key == 202 && yP2>3) dy2--;
-  if (key == 74 && yP2>3) {Serial.println("iciJ");dy2--;} 
   
+  byte key = getKeyCodeOverride();
 
+  if (key == 87 && yP1<22) dy1++; // W = 87 en ascii
+  if (key == 81 && yP1>3) dy1--;  // Q
+  if (key == 78 && yP2<22) dy2++; // N
+  if (key == 74 && yP2>3) dy2--;  // J
+  
   minitel.graphic(0b111111, X1, yP1+3*dy1);
   minitel.moveCursorXY(X1, yP1-2*dy1);
   if (dy1!=0) minitel.graphic(0b000000);
-  //else minitel.graphic(0b111111); //preserve frame rate
+  else minitel.graphic(0b111111); //preserve frame rate
   yP1+=dy1;
 
   minitel.graphic(0b111111, X2, yP2+3*dy2);
   minitel.moveCursorXY(40, yP2-2*dy2);
   if (dy2!=0) minitel.graphic(0b000000);
-  //else minitel.graphic(0b111111); //preserve frame rate
+  else minitel.graphic(0b111111); //preserve frame rate
   yP2+=dy2;
   
 }
@@ -467,14 +436,11 @@ void countdown() {
 
 
 byte getKeyCodeOverride() {
-  //Serial.println("GCOV");
   byte b = 255;
   if (MINITEL_PORT.available()) {
     b = MINITEL_PORT.read();
-    MINITEL_PORT.flush(); 
-    // Serial.println("bbbb");
-    // Serial.println(b) ;
-    //debugPrint(b);
+    MINITEL_PORT.flush();   
+    debugPrint(b);
   }
   return b;
 }
