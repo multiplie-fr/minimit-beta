@@ -19,6 +19,7 @@ void loopCookies() {
 
 	  switch (touche) {
 	      case CONNEXION_FIN:
+        minitel.connexion(false);
 		  	return;
 	      break;
       case ENVOI:
@@ -41,17 +42,11 @@ void FC_retrieveDatas() {
     if (httpResponseCode > 0) {
       String payload = http.getString();
       Serial.println(payload);
-      //Serial.println(buf[i], HEX);
-      //afficheVDT({payload}, 130, 2,2);
-      JSONVar myObject = JSON.parse(payload);
+     JSONVar myObject = JSON.parse(payload);
       if (JSON.typeof(myObject) == "undefined") {
         Serial.println("Parsing input failed!");
         return;
       }
-      //JSONVar description = myObject["weather"][0]["description"];
-      // Serial.println("OOO");
-      //Serial.println(description);
-      // Serial.print(mainmeteo["temp"]);
       afficheRemoteVDT("fc_phrase.vdt", 0, 0);
       JSONVar cookietexte = myObject["texte"];
       int nbLines = cookietexte.length();

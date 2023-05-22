@@ -1,50 +1,31 @@
-
-
-// On attend que l'utilisateur appuie a minima sur une touche de fonction
+// fonction à mettre dans common
 void wait_for_user_action() {
-
-    Serial.println("wait_for_user_action");
-
-    // on met bien l'echo au cas où il aurait disparu
-    minitel.echo(true);
-
-    userInput = "";
-    userInputLength=0;
-	  while(1) {
-      touche = minitel.getKeyCode();
-
-    // saisie de la commande / signe
-    if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
-        userInput += char(touche);
-        userInputLength++;
-        Serial.println(userInput);
-     }
-    
-    // traitement du cas de CONNEXION_FIN à cause du 40 secondes
-    if (touche == CONNEXION_FIN) {
-      Serial.println("CONNEXION_FIN");
+  userInput = "";
+  while (1) {
+    if (currentEcran == "GALERIE") {
+      loopVDT();
     }
 
-    // retour ...
-    if ((touche == CONNEXION_FIN) || (touche == SOMMAIRE) || (touche == ANNULATION) || (touche == RETOUR) || (touche == REPETITION) || (touche == GUIDE) || (touche == CORRECTION) || (touche == SUITE) || (touche == ENVOI)) return;
-    } // fin boucle while
+    touche = minitel.getKeyCode();
 
+    // saisie de la commande
+    if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
+      userInput += char(touche);
+      userInputLength++;
+      // Serial.println("userInput from wait_for-user_action");
+      // Serial.println(userInput);
+    }
+    if ((touche == CONNEXION_FIN) || (touche == SOMMAIRE) || (touche == ANNULATION) || (touche == RETOUR) || (touche == REPETITION) || (touche == GUIDE) || (touche == CORRECTION) || (touche == SUITE) || (touche == ENVOI)) return;  // TODO mettre toutes les touches
+  }
+  // fin boucle while
 }
 
 // init du Minitel a effectuer avant chaque service
 void initMinitelService() {
   minitel.pageMode();
   minitel.newScreen();
+  minitel.echo(true);
 }
-
-
-
-//
-
-
-
-
-
 
 
 void champVide(int x, int y, int longueurchamp) {
@@ -66,18 +47,19 @@ void wifiConnect() {
   if (WiFi.status() == WL_CONNECTED) return;
 
   JSONVar config = myConfig["input"];
-  //const char* ssid = (const char*)config[0];
-  //const char* password = (const char*)config[1];
+  const char* ssid = (const char*)config[0];
+  const char* password = (const char*)config[1];
 
-// HACK
+  // HACK
 
-  const char* ssid = "Dogtown";
-  const char* password = "west100-;";
-
+  // const char* ssid = "Dogtown";
+  // const char* password = "west100-;";
+  // const char* ssid = "Livebox-Xine";
+  // const char* password = "malakoff";
 
   WiFi.begin(ssid, password);
-  Serial.print(ssid);
-  Serial.print(password);
+  Serial.println(ssid);
+  Serial.println(password);
   Serial.println("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     WiFi.begin(ssid, password);
@@ -97,7 +79,7 @@ String getRemoteVDT(String vdtFile, int offsetY, int offsetX) {
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
       String payload = http.getString();
-      return(payload);
+      return (payload);
     }
   }
   return "";
@@ -137,26 +119,45 @@ void startVdt(String stvdt, int offsetX, int offsetY) {
   vdtByteEncours = 0;
 }
 void loopVDT() {
-  if (!isVdtEnCours) {
-    return;
+  //while(1){
+  if (isVdtEnCours) {
+
+    if (vdtByteEncours == (vdtLength - 1)) {
+      isVdtEnCours = false;
+      Serial.println("onsrotlimagest finie");
+      nextUpdate = millis() + timeoutAmount;
+      int currentImage = myObject["current"];
+      String galerieMode = (const char*)myObject["galerieMode"];
+      int nbImages;
+      if(galerieMode=="PERSO")
+      {   
+        nbImages = myObject["datas"]["root"].length();
+      }      
+      else
+      {
+        nbImages = myObject["datasperso"]["root"].length();
+      }
+      if (currentImage < (nbImages - 1)) {
+        currentImage++;
+      } else {
+        currentImage = 0;
+      }
+      myObject["current"] = currentImage;
+      delay(3000);
+      afficheDatasGALERIE();
+    }
+    if (getInterruption() == true) {
+      interruption = false;
+      isVdtEnCours = false;
+      Serial.println("interruption");
+      return;
+    }
+    String myByte = "0x" + vdt.substring(vdtByteEncours, vdtByteEncours + 2);
+    int val = strtoul(myByte.c_str(), NULL, 16);
+    minitel.writeByte(val);
+    vdtByteEncours += 3;
   }
-  if(vdtByteEncours==(vdtLength-1))
-  {
-    isVdtEnCours = false;
-    Serial.println("onsrotlimagest finie");
-    nextUpdate = millis() + timeoutAmount;
-    return;
-  }
- if (getInterruption() == true) {
-    interruption = false;
-    isVdtEnCours = false;
-    Serial.println("interruption");
-    return;
-  }
-  String myByte = "0x" + vdt.substring(vdtByteEncours, vdtByteEncours + 2);
-  int val = strtoul(myByte.c_str(), NULL, 16);
-  minitel.writeByte(val);
-  vdtByteEncours+=3;
+  //}
 }
 void checkScreen(String s, int offsetY, int offsetX) {
   Serial.println("checkscreen");
@@ -165,40 +166,40 @@ void checkScreen(String s, int offsetY, int offsetX) {
   int i = 0;
   int positionnement = 0;
   int startpositionnement = -1;
-  lasttouche=0;
+  lasttouche = 0;
   bool jesors = false;
   for (i = 0; i < str_len; i += 3) {
 
-  //touche = minitel.getKeyCode();
-  //    if(touche==CONNEXION_FIN && lasttouche==CONNEXION_FIN){
-  //     Serial.println("ccccccc2fois");
-  //    minitel.connexion(false);
-  // }
-  //   if (touche == CONNEXION_FIN && lasttouche != CONNEXION_FIN) {
-  //     Serial.println("lalalalFisrt time");
-  //     Serial.println(lasttouche);
-  //     lasttouche=CONNEXION_FIN;
-  //     i=str_len-1;
-  //     minitel.connexion(false);
-  //     displayMire();
-  //     jesors = true;
-  //  }
-  //  else
-  //  {
-  //    lasttouche=0;
-  //  }
-  
-  //   if(jesors){
-  //     break;      
-  //   }
-  // if (getInterruption()==1){
-  //   Serial.println("interruption");
-  //   i=str_len-1;
-  // }
+    //touche = minitel.getKeyCode();
+    //    if(touche==CONNEXION_FIN && lasttouche==CONNEXION_FIN){
+    //     Serial.println("ccccccc2fois");
+    //    minitel.connexion(false);
+    // }
+    //   if (touche == CONNEXION_FIN && lasttouche != CONNEXION_FIN) {
+    //     Serial.println("lalalalFisrt time");
+    //     Serial.println(lasttouche);
+    //     lasttouche=CONNEXION_FIN;
+    //     i=str_len-1;
+    //     minitel.connexion(false);
+    //     displayMire();
+    //     jesors = true;
+    //  }
+    //  else
+    //  {
+    //    lasttouche=0;
+    //  }
+
+    //   if(jesors){
+    //     break;
+    //   }
+    // if (getInterruption()==1){
+    //   Serial.println("interruption");
+    //   i=str_len-1;
+    // }
     String myByte = "0x" + s.substring(i, i + 2);
     int val = strtoul(myByte.c_str(), NULL, 16);
     if (positionnement == 1) {
-      
+
       if (i == startpositionnement + 3) {
         val += offsetY;
       }
@@ -281,4 +282,14 @@ void ligneZero(String message) {
   // minitel.newXY(1, 0);
   // minitel.print(message);
   // minitel.newXY(mx, my);
+}
+void ligneZeroSafe(String message) {
+  int mx = minitel.getCursorX();
+  int my = minitel.getCursorY();
+  minitel.newXY(1, 0);
+  minitel.print(" ");
+  minitel.repeat(35);
+  minitel.newXY(1, 0);
+  minitel.print(message);
+  minitel.newXY(mx, my);
 }

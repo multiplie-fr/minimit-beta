@@ -1,8 +1,4 @@
 // LEMONDE
-
-int userInputNeeded = 0;
-
-
 // SETUP
 void setupLeMonde() {
   minitel.echo(false);
@@ -19,9 +15,9 @@ void setupLeMonde() {
 
 // LOOP 
 void loopLeMonde() {
-
   while (1) {
-
+    champVide(13, 23, 3);
+  
 
     // Input
     wait_for_user_action();
@@ -32,6 +28,7 @@ void loopLeMonde() {
         guideLeMonde();
         break;
       case CONNEXION_FIN:
+      minitel.connexion(false);
         return;
         break;
       case SUITE:
@@ -81,7 +78,7 @@ void loopLeMonde() {
       case ENVOI:
         Serial.println("envoi");
         userInput.toUpperCase();
-        if (userInputNeeded > 0) {
+        if (userInputLength > 0) {
           Serial.println("choix");
           Serial.println(userInput);
           if (!isValidNumber(userInput)) {
@@ -122,6 +119,7 @@ void loopLeMonde() {
       case ANNULATION:
         userInput = "";
         userInputLength = 0;
+        champVide(13, 23, 3);
         break;
       case CORRECTION:
         {
@@ -222,10 +220,10 @@ void displayBandeau() {
 }
 void displayNavArticle(int previousDisplayMode) {
   if (previousDisplayMode == 1) {
-    minitel.moveCursorXY(31, 23);
+    minitel.moveCursorXY(28, 23);
     minitel.print(" ");
-    minitel.repeat(8);
-    minitel.moveCursorXY(31, 23);
+    minitel.repeat(11);
+    minitel.moveCursorXY(30, 23);
     minitel.attributs(CARACTERE_MAGENTA);
     //minitel.print("Revenir au ");
     minitel.attributs(INVERSION_FOND);
@@ -401,6 +399,7 @@ void updateBandeauLEMONDE(String format) {
   if (format == "UNE") {
     minitel.moveCursorXY(18, 2);
     minitel.attributs(CARACTERE_CYAN);
+    minitel.attributs(FOND_BLEU);
     minitel.print(" A LA ");
     minitel.attributs(CARACTERE_BLANC);
     minitel.print("UNE ");

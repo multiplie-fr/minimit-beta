@@ -1,20 +1,22 @@
-// LE PENDU
-
+// PENDU
 // setup
 void setupPendu() {
+  minitel.newScreen();
   minitel.pageMode();
-  afficheSommairePendu(true,false);
+  afficheSommairePendu(true, false);
   myObject["current"] = 0;
   myObject["nbMots"] = 0;
-  saisieColor=CARACTERE_NOIR;
+  saisieColor = CARACTERE_NOIR;
 }
 
 // loop
 void loopPendu() {
- 
-   while (1) {
-  
-    // Input
+
+  while (1) {
+  if (currentEcran != "FIN") {
+    Serial.println("champvide");
+    champVide(11, 17, 1);
+  }
     wait_for_user_action();
 
     switch (touche) {
@@ -22,9 +24,16 @@ void loopPendu() {
         return;
         break;
       case ENVOI:
-        if (userInputLength == 1) {
-          joueLettre(userInput, false);
+        {
+          if (userInputLength == 1) {
+            joueLettre(userInput, false);
+            //champVide(11, 17, 1);
+          }
         }
+        break;
+      case ANNULATION:
+        Serial.println("annulationpendu");
+        champVide(11, 17, 1);
         break;
       case CORRECTION:
         {
@@ -36,25 +45,83 @@ void loopPendu() {
             minitel.moveCursorLeft(1);
             userInput = userInput.substring(0, userInput.length() - 1);
             userInputLength--;
+            Serial.println(userInput);
           }
         }
         break;
       case REPETITION:
         {
           repetitionPENDU();
+          champVide(11, 17, 1);
         }
         break;
       case SOMMAIRE:
         {
-          afficheSommairePendu(false,false);
+          afficheSommairePendu(false, false);
           afficheDatasPENDU();
+          userInput = "";
+          userInputLength = 0;
         }
         break;
     }
   }
 }
 
-// gestion du pendu
+// PENDU stuff
+void localDatasPendu() {
+  String rawDatas = "{\"mots\":[[\"W\",\"A\",\"L\",\"K\",\"M\",\"A\",\"N\"],[\"B\",\"A\",\"L\",\"A\",\"D\",\"E\",\"U\",\"R\"],[\"V\",\"I\",\"D\",\"E\",\"O\",\"C\",\"A\",\"S\",\"S\",\"E\",\"T\",\"T\",\"E\"],[\"M\",\"I\",\"N\",\"I\",\"T\",\"E\",\"L\"],[\"R\",\"E\",\"M\",\"B\",\"O\",\"B\",\"I\",\"N\",\"E\",\"R\"],[\"A\",\"U\",\"T\",\"O\",\"C\",\"U\",\"I\",\"S\",\"E\",\"U\",\"R\"],[\"C\",\"A\",\"T\",\"H\",\"O\",\"D\",\"I\",\"Q\",\"U\",\"E\"],[\"D\",\"I\",\"S\",\"Q\",\"U\",\"E\",\"T\",\"T\",\"E\"],[\"R\",\"A\",\"D\",\"I\",\"O\",\"C\",\"A\",\"S\",\"S\",\"E\",\"T\",\"T\",\"E\"],[\"M\",\"O\",\"N\",\"O\",\"C\",\"H\",\"R\",\"O\",\"M\",\"E\"],[\"C\",\"A\",\"L\",\"C\",\"U\",\"L\",\"E\",\"T\",\"T\",\"E\"],[\"P\",\"L\",\"A\",\"T\",\"I\",\"N\",\"E\"],[\"V\",\"I\",\"N\",\"Y\",\"L\",\"E\"],[\"M\",\"A\",\"G\",\"N\",\"E\",\"T\",\"O\",\"S\",\"C\",\"O\",\"P\",\"E\"],[\"C\",\"A\",\"M\",\"E\",\"S\",\"C\",\"O\",\"P\",\"E\"],[\"C\",\"A\",\"R\",\"A\",\"V\",\"A\",\"N\",\"E\"],[\"C\",\"O\",\"N\",\"C\",\"O\",\"R\",\"D\",\"E\"],[\"P\",\"I\",\"N\",\"\'\",\"S\"],[\"D\",\"Y\",\"N\",\"A\",\"S\",\"T\",\"I\",\"E\"],[\"V\",\"A\",\"C\",\"H\",\"E\",\"M\",\"E\",\"N\",\"T\"],[\"A\",\"R\",\"C\",\"A\",\"D\",\"E\"],[\"C\",\"U\",\"S\",\"T\",\"O\",\"M\",\"I\",\"S\",\"E\",\"R\"],[\"B\",\"I\",\"G\",\"O\",\"P\",\"H\",\"O\",\"N\",\"E\"],[\"C\",\"H\",\"E\",\"B\",\"R\",\"A\",\"N\"],[\"T\",\"O\",\"N\",\"T\",\"O\",\"N\"],[\"B\",\"O\",\"U\",\"M\"],[\"H\",\"E\",\"X\",\"A\",\"G\",\"O\",\"N\",\"A\",\"L\"],[\"A\",\"E\",\"R\",\"O\",\"B\",\"I\",\"C\"],[\"C\",\"R\",\"A\",\"I\",\"G\",\"N\",\"O\",\"S\"],[\"V\",\"E\",\"R\",\"L\",\"A\",\"N\"],[\"S\",\"L\",\"I\",\"B\",\"A\",\"R\",\"D\"],[\"B\",\"A\",\"N\",\"D\",\"A\",\"N\",\"A\"],[\"B\",\"O\",\"T\",\"T\",\"I\",\"N\"],[\"T\",\"O\",\"P\",\" \",\"M\",\"O\",\"U\",\"M\",\"O\",\"U\",\"T\",\"E\"]]}";
+  JSONVar myDatas = JSON.parse(rawDatas);
+  int cnt = myDatas["mots"].length();
+  int arr[cnt];
+  // Populate the array using a loop
+  for (int i = 0; i < cnt; i++) {
+    arr[i] = i;
+  }
+  // Get the length of the array
+  int arrLength = sizeof(arr) / sizeof(arr[0]);
+  // Shuffle the array
+  for (int i = arrLength - 1; i >= 1; i--) {
+    int j = random(i + 1);
+    int temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+  JSONVar mots = JSON.parse("[]");
+  for (int i = 0; i < cnt; i++) {
+    JSONVar lemot = myDatas["mots"][arr[i]];
+    if (JSON.typeof(lemot) == "array") {
+      mots[i] = lemot;
+    }
+  }
+  myDatas["mots"] = mots;
+  myObject["myDatas"] = myDatas;
+  afficheDatasPENDU();
+}
+void retrieveDatasPENDU() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String serverPath = serverName + String("pendu/getjsonfull.php");
+    Serial.println(serverPath);
+    // Your Domain name with URL path or IP address with path
+    http.begin(serverPath.c_str());
+    int httpResponseCode = http.GET();
+    if (httpResponseCode > 0) {
+      String payload = http.getString();
+      JSONVar myDatas = JSON.parse(payload);
+      if (JSON.typeof(myDatas) == "undefined") {
+        Serial.println(payload);
+        Serial.println("Parsing input failed!");
+        return;
+      }
+      myObject["myDatas"] = myDatas;
+      afficheDatasPENDU();
+    }
+    // Free resources
+    http.end();
+  } else {
+    Serial.println("WiFi Disconnected");
+  }
+}
 void afficheSommairePendu(boolean firsttime, boolean refresh) {
   currentEcran = "SOMMAIRE";
   minitel.newScreen();
@@ -68,17 +135,16 @@ void afficheSommairePendu(boolean firsttime, boolean refresh) {
     }
 
   } else {
-    if (!refresh){
-    int current = myObject["current"];
-    JSONVar lesmots = myObject["myDatas"]["mots"];
-    if (current>=myObject["myDatas"]["mots"].length()-1){
-       current=0;
+    if (!refresh) {
+      int current = myObject["current"];
+      JSONVar lesmots = myObject["myDatas"]["mots"];
+      if (current >= myObject["myDatas"]["mots"].length() - 1) {
+        current = 0;
+      } else {
+        current++;
+      }
+      myObject["current"] = current;
     }
-    else {
-       current++;
-    }
-    myObject["current"] = current;
-  }
   }
 }
 
@@ -156,9 +222,8 @@ void repetitionPENDU() {
   Serial.println(proposed);
   unsigned int str_len = proposed.length() + 2;
   int i = 0;
-  for (i=0; i<str_len; i+=2)
-  {
-    Serial.println(proposed.substring(i,i+1));
+  for (i = 0; i < str_len; i += 2) {
+    Serial.println(proposed.substring(i, i + 1));
   }
 }
 void joueLettre(String input, boolean refresh) {
@@ -219,81 +284,19 @@ void afficheDatasPENDU() {
   myObject["potence5"] = "1f,4a,5e,0e,1b,57,1b,45,28,1f,4b,5f,0e,1b,55,29,30,1f,4c,60,0e,1b,55,22,24,1f,48,4b";
   myObject["potence6"] = "1f,4e,5d,0e,1b,55,38,1f,4f,5a,0e,1b,55,40,40,26,1f,50,5b,0e,1b,55,21,1f,49,4b";
   myObject["potence7"] = "1f,4e,5e,1f,4e,5e,0e,1b,55,29,30,1f,4f,5f,0e,1b,55,22,44,40,1f,50,61,0e,1b,55,21";
- 
+
   myObject["ok"] = 0;
   myObject["ko"] = 0;
   myObject["proposed"] = "";
   minitel.newXY(3, 5);
   int n = motok.length();
-  Serial.println("n");
-  Serial.println(String(n));
-  for (int i=0; i<n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     String lettre = (const char*)motok[i];
-    if (lettre==" "||lettre=="'")
-    {
-        minitel.print (lettre);
-        myObject["ok"] = 1; 
+    if (lettre == " " || lettre == "'") {
+      minitel.print(lettre);
+      myObject["ok"] = 1;
+    } else {
+      minitel.print("-");
     }
-    else {
-    minitel.print("-");
-    }
-  }
-  
-  //minitel.repeat(motok.length() - 1);
-}
-void localDatasPendu() {
-  //String dd = "{\"root\":{\"mots\":[{\"motok\":[\"W\",\"A\",\"L\",\"K\",\"M\",\"A\",\"N\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"B\",\"A\",\"L\",\"A\",\"D\",\"E\",\"U\",\"R\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"V\",\"I\",\"D\",\"E\",\"O\",\"C\",\"A\",\"S\",\"S\",\"E\",\"T\",\"T\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"M\",\"I\",\"N\",\"I\",\"T\",\"E\",\"L\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"R\",\"E\",\"M\",\"B\",\"O\",\"B\",\"I\",\"N\",\"E\",\"R\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"A\",\"U\",\"T\",\"O\",\"C\",\"U\",\"I\",\"S\",\"E\",\"U\",\"R\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"C\",\"A\",\"T\",\"H\",\"O\",\"D\",\"I\",\"Q\",\"U\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"D\",\"I\",\"S\",\"Q\",\"U\",\"E\",\"T\",\"T\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"R\",\"A\",\"D\",\"I\",\"O\",\"C\",\"A\",\"S\",\"S\",\"E\",\"T\",\"T\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"M\",\"O\",\"N\",\"O\",\"C\",\"H\",\"R\",\"O\",\"M\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"C\",\"A\",\"L\",\"C\",\"U\",\"L\",\"E\",\"T\",\"T\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"P\",\"L\",\"A\",\"T\",\"I\",\"N\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"V\",\"I\",\"N\",\"Y\",\"L\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"M\",\"A\",\"G\",\"N\",\"E\",\"T\",\"O\",\"S\",\"C\",\"O\",\"P\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"C\",\"A\",\"M\",\"E\",\"S\",\"C\",\"O\",\"P\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"C\",\"A\",\"R\",\"A\",\"V\",\"A\",\"N\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"C\",\"O\",\"N\",\"C\",\"O\",\"R\",\"D\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"P\",\"I\",\"N\",\"\'\",\"S\"],\"motko\":[\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"D\",\"Y\",\"N\",\"A\",\"S\",\"T\",\"I\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"V\",\"A\",\"C\",\"H\",\"E\",\"M\",\"E\",\"N\",\"T\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"A\",\"R\",\"C\",\"A\",\"D\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"C\",\"U\",\"S\",\"T\",\"O\",\"M\",\"I\",\"S\",\"E\",\"R\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"B\",\"I\",\"G\",\"O\",\"P\",\"H\",\"O\",\"N\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"C\",\"H\",\"E\",\"B\",\"R\",\"A\",\"N\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"T\",\"O\",\"N\",\"T\",\"O\",\"N\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"B\",\"O\",\"U\",\"M\"],\"motko\":[\"\",\"\",\"\",\"\"]},{\"motok\":[\"H\",\"E\",\"X\",\"A\",\"G\",\"O\",\"N\",\"A\",\"L\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"A\",\"E\",\"R\",\"O\",\"B\",\"I\",\"C\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"C\",\"R\",\"A\",\"I\",\"G\",\"N\",\"O\",\"S\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"V\",\"E\",\"R\",\"L\",\"A\",\"N\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"S\",\"L\",\"I\",\"B\",\"A\",\"R\",\"D\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"B\",\"A\",\"N\",\"D\",\"A\",\"N\",\"A\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"B\",\"O\",\"T\",\"T\",\"I\",\"N\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\"]},{\"motok\":[\"T\",\"O\",\"P\",\" \",\"M\",\"O\",\"U\",\"M\",\"O\",\"U\",\"T\",\"E\"],\"motko\":[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]}]}}";
-  String rawDatas="{\"mots\":[[\"W\",\"A\",\"L\",\"K\",\"M\",\"A\",\"N\"],[\"B\",\"A\",\"L\",\"A\",\"D\",\"E\",\"U\",\"R\"],[\"V\",\"I\",\"D\",\"E\",\"O\",\"C\",\"A\",\"S\",\"S\",\"E\",\"T\",\"T\",\"E\"],[\"M\",\"I\",\"N\",\"I\",\"T\",\"E\",\"L\"],[\"R\",\"E\",\"M\",\"B\",\"O\",\"B\",\"I\",\"N\",\"E\",\"R\"],[\"A\",\"U\",\"T\",\"O\",\"C\",\"U\",\"I\",\"S\",\"E\",\"U\",\"R\"],[\"C\",\"A\",\"T\",\"H\",\"O\",\"D\",\"I\",\"Q\",\"U\",\"E\"],[\"D\",\"I\",\"S\",\"Q\",\"U\",\"E\",\"T\",\"T\",\"E\"],[\"R\",\"A\",\"D\",\"I\",\"O\",\"C\",\"A\",\"S\",\"S\",\"E\",\"T\",\"T\",\"E\"],[\"M\",\"O\",\"N\",\"O\",\"C\",\"H\",\"R\",\"O\",\"M\",\"E\"],[\"C\",\"A\",\"L\",\"C\",\"U\",\"L\",\"E\",\"T\",\"T\",\"E\"],[\"P\",\"L\",\"A\",\"T\",\"I\",\"N\",\"E\"],[\"V\",\"I\",\"N\",\"Y\",\"L\",\"E\"],[\"M\",\"A\",\"G\",\"N\",\"E\",\"T\",\"O\",\"S\",\"C\",\"O\",\"P\",\"E\"],[\"C\",\"A\",\"M\",\"E\",\"S\",\"C\",\"O\",\"P\",\"E\"],[\"C\",\"A\",\"R\",\"A\",\"V\",\"A\",\"N\",\"E\"],[\"C\",\"O\",\"N\",\"C\",\"O\",\"R\",\"D\",\"E\"],[\"P\",\"I\",\"N\",\"\'\",\"S\"],[\"D\",\"Y\",\"N\",\"A\",\"S\",\"T\",\"I\",\"E\"],[\"V\",\"A\",\"C\",\"H\",\"E\",\"M\",\"E\",\"N\",\"T\"],[\"A\",\"R\",\"C\",\"A\",\"D\",\"E\"],[\"C\",\"U\",\"S\",\"T\",\"O\",\"M\",\"I\",\"S\",\"E\",\"R\"],[\"B\",\"I\",\"G\",\"O\",\"P\",\"H\",\"O\",\"N\",\"E\"],[\"C\",\"H\",\"E\",\"B\",\"R\",\"A\",\"N\"],[\"T\",\"O\",\"N\",\"T\",\"O\",\"N\"],[\"B\",\"O\",\"U\",\"M\"],[\"H\",\"E\",\"X\",\"A\",\"G\",\"O\",\"N\",\"A\",\"L\"],[\"A\",\"E\",\"R\",\"O\",\"B\",\"I\",\"C\"],[\"C\",\"R\",\"A\",\"I\",\"G\",\"N\",\"O\",\"S\"],[\"V\",\"E\",\"R\",\"L\",\"A\",\"N\"],[\"S\",\"L\",\"I\",\"B\",\"A\",\"R\",\"D\"],[\"B\",\"A\",\"N\",\"D\",\"A\",\"N\",\"A\"],[\"B\",\"O\",\"T\",\"T\",\"I\",\"N\"],[\"T\",\"O\",\"P\",\" \",\"M\",\"O\",\"U\",\"M\",\"O\",\"U\",\"T\",\"E\"]]}";
-  JSONVar myDatas = JSON.parse(rawDatas);
-  int cnt = myDatas["mots"].length();
-  int arr[cnt];
-  // Populate the array using a loop
-  for (int i = 0; i < cnt; i++) {
-    arr[i] = i;
-  }
-  // Get the length of the array
-  int arrLength = sizeof(arr) / sizeof(arr[0]);
-   // Shuffle the array
-  for (int i = arrLength - 1; i >= 1; i--) {
-    int j = random(i + 1);
-    int temp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = temp;
-  }
-  JSONVar mots = JSON.parse("[]");
-  for (int i = 0; i < cnt; i++) {
-    JSONVar lemot = myDatas["mots"][arr[i]];
-   if (JSON.typeof(lemot) == "array") {
-       mots[i] = lemot;
-    }
-  }
-  myDatas["mots"]=mots;
-  myObject["myDatas"] = myDatas;
-  afficheDatasPENDU();
-}
-void retrieveDatasPENDU() {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    String serverPath = serverName + String("pendu/getjsonfull.php");
-    Serial.println(serverPath);
-    // Your Domain name with URL path or IP address with path
-    http.begin(serverPath.c_str());
-    int httpResponseCode = http.GET();
-    if (httpResponseCode > 0) {
-      String payload = http.getString();
-      JSONVar myDatas = JSON.parse(payload);
-      if (JSON.typeof(myDatas) == "undefined") {
-        Serial.println(payload);
-        Serial.println("Parsing input failed!");
-        return;
-      }
-      myObject["myDatas"] = myDatas;
-      afficheDatasPENDU();
-    }
-    // Free resources
-    http.end();
-  } else {
-    Serial.println("WiFi Disconnected");
   }
 }

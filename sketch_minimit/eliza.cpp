@@ -14,8 +14,7 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 	{
 		"hello",
 		{
-			"How do you do. Please state your problem.",
-			"Hi.  What seems to be your problem ?"
+			"How do you do. Please state your problem."
 		}
 	},
 	{
@@ -24,19 +23,13 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 			"Do computers worry you?",
 			"What do you think about machines?",
 			"Why do you mention computers?",
-			"What do you think machines have to do with your problem?",
-			"Don't you think computers can help people ?",
-			 "What about machines worrys you ?",
-			 "What do you think about machines ?"
-				
-				
+			"What do you think machines have to do with your problem?"
 		}
 	},
 	{
 		"name",
 		{
-			"I am not interested in names",
-			"I've told you before, I don't care about names -- please continue."
+			"I am not interested in names"
 		}
 	},
 	{
@@ -44,8 +37,7 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 		{
 			"Please don't apologize",
 			"Apologies are not necessary",
-			"What feelings do you have when you apologize",
-			"I've told you that apologies are not required"
+			"What feelings do you have when you apologize"
 		}
 	},
 	{
@@ -135,24 +127,10 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 	{
 		"i am sad",
 		{
-			"I am sorry to hear you are sad",
-			"I'm sure its not pleasant to be sad",
-			    "Do you think that coming here will help you not to be sad ?",
-			    "Can you explain what made you sad ?"
+			"I am sorry to hear you are depressed",
+			"I'm sure its not pleasant to be sad"
 		}
 	},
-
-	{
-		"i am happy",
-		{
-		    "How have I helped you to be happy ?",
-		    "Has your treatment made you happy?",
-		    "What makes you happy just now ?",
-		    "Can you explan why you are suddenly happy ?"
-		}
-	},
-
-
 	{
 		"are like",
 		{
@@ -172,14 +150,7 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 		"alike",
 		{
 			"In what way?",
-			"What similarities are there?",
-			    "What resemblence do you see ?",
-			    "What does that similarity suggest to you ?",
-			    "What other connections do you see ?",
-			    "What do you suppose that resemblence means ?",
-			    "What is the connection, do you suppose ?",
-			    "Could here really be some connection ?",
-			    "How ?"
+			"What similarities are there?"
 		}
 	},
 	{
@@ -202,40 +173,6 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 			"What if you were #~# ?",
 			"Do you thin you were #~#",
 			"What would it mean if you were #~#"
-			"Were you #~# ?",
-			"What does #~# suggest to you ?"
-
-		}
-	},
-	{
-		"was you",
-		{
-		      "Would you like to believe I was #~# ?",
-		      "What suggests that I was #~# ?",
-		      "What do you think ?",
-		      "Perhaps I was #~# .",
-		      "What if I had been #~# ?"
-		}
-	},
-	
-	{
-		"i desire",
-		{
-	        "What would it mean to you if you got #~# ?",
-	        "Why do you want #~# ?",
-	        "Suppose you got #~# soon ?",
-	        "What if you never got #~# ?",
-	        "What would getting #~# mean to you ?",
-	        "What does wanting #~# have to do with this discussion ?"
-		}
-	},
-
-	{
-		"i believe",
-		{
-	        "Do you really think so ?"
-	        "But you are not sure you believe."
-	        "Do you really doubt you believe?"
 		}
 	},
 	{
@@ -243,11 +180,6 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 		{
 			"In what way are you #~#",
 			"Do you want to be #~# ?",
-		    "Is it because you are #~# that you came to me ?",
-		    "How long have you been #~# ?",
-		    "Do you believe it is normal to be #~# ?",
-		    "Do you enjoy being #~# ?"
-			
 		}
 	},
 	{
@@ -271,17 +203,13 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 		{
 			"Why are you interested in whether I am #~# or not?",
 			"Would you prefer if I weren't #~#",
-			"Perhaps I am #~# in your fantasies",
-			"Do you sometimes think I am #~# ?"
+			"Perhaps I am #~# in your fantasies"
 		}
 	},
 	{
 		"you are",
 		{
-			"What makes you think I am #~# ?",
-		    "Does it please you to believe I am #~# ?",
-		    "Do you sometimes wish you were #~# ?",
-		    "Perhaps you would like to be #~# ."
+			"What makes you think I am #~# ?"
 		}
 	},
 	{
@@ -289,34 +217,9 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 		{
 			"Is that the real reason?",
 			"What other reasons might there be?",
-			"Does that reason seem to explain anything else?",
-			"Don't any other reasons come to mind ?"
-				
+			"Does that reason seem to explain anything else?"
 		}
 	},
-	{
-		"why don't you",
-		{
-		      "Do you believe I don't #~# ?",
-		      "Perhaps I will #~# in good time.",
-		      "Should you #~# yourself ?",
-		      "You want me to #~# ?"
-				
-		}
-	},
-
-
-	{
-		"why can't i",
-		{
-		    "Do you think you should be able to #~# ?",
-		    "Do you want to be able to #~# ?",
-		    "Do you believe this will help you to #~# ?",
-		    "Have you any idea why you can't #~# ?"
-				
-		}
-	},
-
 	{
 		"were you",
 		{
@@ -329,11 +232,7 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 		"i can't",
 		{
 			"Maybe you could #~# now",
-			"What if you could #~# ?",
-			"How do you think that you can't #~# ?",
-		    "Have you tried ?",
-		    "Perhaps you could #~# now.",
-		    "Do you really want to be able to #~# ?"
+			"What if you could #~# ?"
 		}
 	},
 	{
@@ -348,50 +247,10 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 			"What other feelings do you have?"
 		}
 	},
-	
 	{
-		"i don't",
+		"i*you",
 		{
-		    "Don't you really #~# ?",
-		    "Why don't you #~# ?",
-		    "Do you wish to be able to #~# ?",
-		    "Does that trouble you ?"
-		}
-	},
-	
-	{
-		"do i feel",
-		{
-		    "Tell me more about such feelings.",
-		    "Do you often feel #~# ?",
-		    "Do you enjoy feeling #~# ?",
-		    "Of what does feeling #~# remind you ?"
-		}
-	},
-	
-	
-	{
-		"i * you",
-		{
-			"Perhaps in your fantasy we >|< each other",
-			"Do you wish to >|< me ?",
-		    "You seem to need to >|< me.",
-		    "Do you >|< anyone else ?"
-				
-				
-				
-		}
-	},
-	{
-		"you * me",
-		{
-		    "Why do you think I >|< you ?",
-		    "You like to think I >|< you -- don't you ?",
-		    "What makes you think I >|< you ?",
-		    "Really, I >|< you ?",
-		    "Do you wish to believe I >|< you ?",
-		    "Suppose I did >|< you -- what would that mean ?",
-		    "Does someone else believe I >|< you ?"
+			"Perhaps in your fantasy we >|< each other"
 		}
 	},
 	{
@@ -407,17 +266,7 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 		{
 			"You seem quite positive",
 			"You are sure",
-			"I understand",
-			"I see."
-		}
-	},
-	{
-		"i",
-		{
-		    "You say #~# ?",
-		    "Can you elaborate on that ?",
-		    "Do you say #~# for some special reason ?",
-		    "That's quite interesting."
+			"I understand"
 		}
 	},
 	{
@@ -425,9 +274,7 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 		{
 			"Why not?",
 			"You are being a bit negative",
-			"Are you saying \"NO\" just to be negative?",
-			    "Why \"NO\" ?"
-				
+			"Are you saying \"NO\" just to be negative?"
 		}
 	},
 	{
@@ -442,13 +289,7 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 			"surely not everyone",
 			"Can you think of anyone in particular?",
 			"Who for example?",
-			"You are thinking of a special person",
-			"Realy, #~# ?",
-		    "Surely not #~# .",
-		    "Who, may I ask ?",
-		    "Someone special perhaps ?",
-		    "You have a particular person in mind, don't you ?",
-		    "Who do you think you're talking about ?"
+			"You are thinking of a special person"
 		}
 	},
 	{
@@ -467,87 +308,22 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 			"Does that question interest you?",
 			"What is it you really want to know?",
 			"What do you think?",
-			"What comes to your mind when you ask that?",
-		    "Are such questions much on your mind ?",
-		    "What answer would please you most ?",
-		    "Have you asked such questions before ?",
-		    "Have you asked anyone else ?"				
+			"What comes to your mind when you ask that?"
 		}
 	},
 	{
 		"perhaps",
 		{
-			"You do not seem quite certain",
-			"Why the uncertain tone ?",
-			"Can't you be more positive ?",
-			 "You aren't sure ?",
-			 "Don't you know ?",
+			"You do not seem quite certain"
 		}
 	},
 	{
 		"are",
 		{
 			"Did you think they might not be #~#",
-			"Possibly they are #~#",
-		    "Why are you interested in whether I am #~# or not ?",
-		    "Would you prefer if I weren't #~# ?",
-		    "Perhaps I am #~# in your fantasies.",
-		    "Do you sometimes think I am #~# ?"
-				
-				
+			"Possibly they are #~#"
 		}
 	},
-	{
-		"your",
-		{
-		    "Why are you concerned over my #~# ?",
-		    "What about your own #~# ?",
-		    "Are you worried about someone else's #~# ?",
-		    "Really, my #~# ?"
-		}
-	},
-	{
-		"my",
-		{
-		    "Lets discuss further why your #~# ."
-		    "Earlier you said your #~# ."
-		    "But your #~# ."
-		    "Does that have anything to do with the fact that your #~# ?"
-		    "Tell me more about your family."
-		    "Who else in your family #~# ?"
-		    "Your #~# ?"
-		    "What else comes to mind when you think of your #~# ?"
-		    "Why do you say your #~# ?"
-		    "Does that suggest anything else which belongs to you ?"
-		    "Is it important that your #~# ?"
-		}
-	},
-	{
-		"you",
-		{
-		    "We were discussing you -- not me.",
-		    "Oh, I #~# ?",
-		    "You're not really talking about me -- are you ?",
-		    "What are your feelings now ?"
-		}
-	},
-
-	{
-		"can you",
-		{
-	        "You believe I can #~# don't you ?"
-		}
-	},
-
-	{
-		"can i",
-		{
-	        "Whether or not you can #~# depends on you more than me.",
-	        "Do you want to be able to #~# ?",
-	        "Perhaps you don't want to #~# ."
-		}
-	},
-
 	{
 		"",
 		{
@@ -556,13 +332,7 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 			"What does that suggest to you?",
 			"Please continue",
 			"Go on",
-			"Do you feel strongly about discussing such things?",
-			"You say #~# ?",
-		    "Can you elaborate on that ?",
-		    "Do you say #~#) for some special reason ?",
-		    "That's quite interesting."
-				
-				
+			"Do you feel strongly about discussing such things?"
 		}
 	}
 };
