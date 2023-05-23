@@ -29,8 +29,7 @@ JSONVar getOTAConfig() {
 void writeOTAConfig(String version) {
   File file = SPIFFS.open(confOTA, "w");
   if (!file) {
-    // File not found | le fichier de test n'existe pas
-    Serial.println("Failed to open test file");
+    Serial.println("Failed to open confOTA");
     return;
   } else {
     JSONVar myconfig = {};
@@ -43,7 +42,7 @@ JSONVar readOTAConfig() {
   File file = SPIFFS.open(confOTA, "r");
   JSONVar theresult = {};
   if (!file) {
-    Serial.println("Failed to open file for reading");
+    Serial.println("Failed to open confOTA");
     return theresult;
   } else {
     int s = file.size();
@@ -55,7 +54,6 @@ JSONVar readOTAConfig() {
       i++;
     }
     String myString = String(content);
-    Serial.println(myString);
     theresult = JSON.parse(content);
     return theresult;
   }

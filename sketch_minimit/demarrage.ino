@@ -62,6 +62,7 @@ void displayDemarrage() {
       if(flag_ota == true)
       {
         //On lance le service OTA
+        ligneZeroSafe("");
         Serial.println("Launching OTA");
         setLastVersionOTA(lastVersion);
         launchService("OTA");
