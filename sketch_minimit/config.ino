@@ -97,11 +97,14 @@ void loopConfig() {
           JSONVar coords = myObject["coords"][currentLine];
           myObject["input"][currentLine] = "";
           champVide(myObject["coords"][currentLine][0], myObject["coords"][currentLine][1], myObject["coords"][currentLine][2]);
+          Serial.println(myObject["input"]);
         }
         break;
       case CORRECTION:
         {
-          int nbCaracteres = userInput.length();
+          int currentLine = myObject["currentLine"];
+          String acorriger = (const char*)myObject["input"][currentLine];
+          int nbCaracteres = acorriger.length()+userInput.length();
           if (nbCaracteres > 0) {
             minitel.moveCursorLeft(1);
             minitel.attributs(saisieColor);
@@ -115,7 +118,8 @@ void loopConfig() {
         break;
       case ENVOI:
         {
-          myObject["input"][myObject["currentLine"]] = userInput;
+          int currentLine = myObject["currentLine"];
+          myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
           JSONVar myconfig = {};
           File file = SPIFFS.open(confFile, "w");
           if (!file) {
