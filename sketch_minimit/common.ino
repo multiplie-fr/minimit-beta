@@ -139,11 +139,11 @@ void loopVDT() {
       int nbImages;
       if(galerieMode=="PERSO")
       {   
-        nbImages = myObject["datas"]["root"].length();
+        nbImages = myObject["datasperso"]["root"].length();
       }      
       else
       {
-        nbImages = myObject["datasperso"]["root"].length();
+        nbImages = myObject["datas"]["root"].length();
       }
       if (currentImage < (nbImages - 1)) {
         currentImage++;
