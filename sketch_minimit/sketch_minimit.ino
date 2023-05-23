@@ -62,7 +62,6 @@ void setup() {
 // en fonction de ça elle lance via launchService les différentes services, que ce soit GUIDE ou Astro ...
 
 void loop() {
-    Serial.println(__func__);
 
     champVide(12, 17, 29);
 		wait_for_user_action();
@@ -124,7 +123,6 @@ void loop() {
 // généralement parce qu'il y a eu un CNX/FIN
 
 int launchService(String minimit_service) {
-    Serial.println(__func__);
 
   myObject = (JSONVar){};
   
@@ -281,14 +279,12 @@ if (minimit_service == "TAROT" || minimit_service =="13" ) {
 // j'ajoute init parce que l'idée est dêtre sur que les paramètres sont bien rétablis
 // au cas où des services ont fait n'importe quoi
 void init_and_displayMire(boolean deconnecter) {
-    Serial.println(__func__);
 
   currentService="";
   //minitel.connexion(false); // Si je mets ca la, ca s'arrete quand on vient de demarrage et qu'on est pas connecté  
   if(deconnecter)
   {
-    Serial.println("init_and_displayMire minitel.connexion(false)");
-    //minitel.connexion(false);
+    minitel.connexion(false);
   }
   saisieColor=CARACTERE_JAUNE;
   minitel.attributs(CARACTERE_JAUNE);

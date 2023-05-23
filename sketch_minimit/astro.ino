@@ -97,19 +97,14 @@ void afficheDatasASTRO() {
   minitel.noCursor();
 }
 void retrieveDatasASTRO() {
-  Serial.print(userInput);
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath = serverName + String("astro/getjson.php?signe=") + userInput;
-    Serial.println(serverPath);
     // Your Domain name with URL path or IP address with path
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
       String payload = http.getString();
-      Serial.println("");
-      Serial.print(payload);
-      Serial.println("");
       myObject = JSON.parse(payload);
       if (JSON.typeof(myObject) == "undefined") {
         Serial.println("Parsing input failed!");

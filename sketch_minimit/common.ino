@@ -1,6 +1,5 @@
 // fonction à mettre dans common
 void wait_for_user_action() {
-    Serial.println(__func__);
 
   userInput = "";
   while (1) {
@@ -10,7 +9,6 @@ void wait_for_user_action() {
 
     touche = minitel.getKeyCode();
 
-    if (touche) Serial.println(touche);
 
     // saisie de la commande
     if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
@@ -18,8 +16,6 @@ void wait_for_user_action() {
       userInputLength++;
     }
     if ((touche == CONNEXION_FIN) || (touche == SOMMAIRE) || (touche == ANNULATION) || (touche == RETOUR) || (touche == REPETITION) || (touche == GUIDE) || (touche == CORRECTION) || (touche == SUITE) || (touche == ENVOI)) {
-      Serial.println("sortie de wait_for_user_action userInput puis touche "+userInput);
-      Serial.println(touche);
       return;
     } 
   }
@@ -50,7 +46,6 @@ void champVide(int x, int y, int longueurchamp) {
 }
 
 void wifiConnect() {
-      Serial.println(__func__);
 
   if (WiFi.status() == WL_CONNECTED) return;
 
@@ -66,14 +61,9 @@ void wifiConnect() {
   // const char* password = "malakoff";
 
   WiFi.begin(ssid, password);
-  Serial.println(ssid);
-  Serial.println(password);
-  Serial.println("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     WiFi.begin(ssid, password);
     delay(2000);
-    Serial.println("wifi status");
-    Serial.println(WiFi.status());
   }
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());
@@ -82,7 +72,6 @@ String getRemoteVDT(String vdtFile, int offsetY, int offsetX) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath = serverName + String("vdt2.php?f=") + vdtFile;
-    Serial.println(serverPath);
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
@@ -96,7 +85,6 @@ void afficheRemoteVDT(String vdtFile, int offsetY, int offsetX) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath = serverName + String("vdt2.php?f=") + vdtFile;
-    Serial.println(serverPath);
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
@@ -122,8 +110,6 @@ void startVdt(String stvdt, int offsetX, int offsetY) {
   vdtoffsetX = offsetX;
   vdtoffsetY = offsetY;
   vdtLength = stvdt.length() + 2;
-  Serial.println("vdtlength");
-  Serial.println(vdtLength);
   vdtByteEncours = 0;
 }
 void loopVDT() {
@@ -132,7 +118,6 @@ void loopVDT() {
 
     if (vdtByteEncours == (vdtLength - 1)) {
       isVdtEnCours = false;
-      Serial.println("onsrotlimagest finie");
       nextUpdate = millis() + timeoutAmount;
       int currentImage = myObject["current"];
       String galerieMode = (const char*)myObject["galerieMode"];
@@ -157,7 +142,6 @@ void loopVDT() {
     if (getInterruption() == true) {
       interruption = false;
       isVdtEnCours = false;
-      Serial.println("interruption");
       return;
     }
     String myByte = "0x" + vdt.substring(vdtByteEncours, vdtByteEncours + 2);
@@ -178,32 +162,7 @@ void checkScreen(String s, int offsetY, int offsetX) {
   bool jesors = false;
   for (i = 0; i < str_len; i += 3) {
 
-    //touche = minitel.getKeyCode();
-    //    if(touche==CONNEXION_FIN && lasttouche==CONNEXION_FIN){
-    //     Serial.println("ccccccc2fois");
-    //    minitel.connexion(false);
-    // }
-    //   if (touche == CONNEXION_FIN && lasttouche != CONNEXION_FIN) {
-    //     Serial.println("lalalalFisrt time");
-    //     Serial.println(lasttouche);
-    //     lasttouche=CONNEXION_FIN;
-    //     i=str_len-1;
-    //     minitel.connexion(false);
-    //     displayMire();
-    //     jesors = true;
-    //  }
-    //  else
-    //  {
-    //    lasttouche=0;
-    //  }
-
-    //   if(jesors){
-    //     break;
-    //   }
-    // if (getInterruption()==1){
-    //   Serial.println("interruption");
-    //   i=str_len-1;
-    // }
+   
     String myByte = "0x" + s.substring(i, i + 2);
     int val = strtoul(myByte.c_str(), NULL, 16);
     if (positionnement == 1) {

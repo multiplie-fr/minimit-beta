@@ -1,10 +1,9 @@
 
 JSONVar readConfig() {
-  Serial.println(__func__);
   File file = SPIFFS.open(confFile, "r");
   JSONVar theresult = {};
   if (!file) {
-    Serial.println("Failed to open file for reading");
+    Serial.println("SPIFFS error ...");
     return theresult;
   } else {
     int s = file.size();
@@ -21,11 +20,9 @@ JSONVar readConfig() {
   }
 }
 void displayDemarrage() {
-  Serial.println(__func__);
 
   JSONVar config = readConfig();
   myConfig = config;
-  Serial.println("displayDemarrage, config "+myConfig);
 
   boolean isConfig;
   if (JSON.typeof(myConfig) == "undefined") {
@@ -40,7 +37,7 @@ void displayDemarrage() {
     minimitVersion = "v0";
   } else {
     minimitVersion = (const char*)myOTAConfig["version"];
-    Serial.println("Current version OTA"+minimitVersion);
+    Serial.println("Current version OTA="+minimitVersion);
   }
 
   String vdt = "14,0c,1f,46,54,0e,1b,46,40,50,1f,47,53,0e,1b,46,58,1b,56,20,20,1b,40,22,1b,50,1b,46,30,1f,48,51,0e,1b,46,40,1b,56,1b,40,21,20,12,43,1b,45,58,1f,49,51,0e,1b,56,1b,40,21,20,12,42,1b,45,40,1b,55,1b,46,21,1b,40,30,1f,4a,51,0e,1b,56,20,12,42,1b,45,58,1b,55,1b,40,40,1b,50,1b,45,21,4a,1f,4b,51,0e,1b,56,1b,40,30,20,20,1b,55,48,1b,50,20,20,1b,55,25,1b,50,1b,45,30,1f,4c,51,0e,1b,46,22,1b,56,1b,40,30,20,1b,55,4a,1b,50,1b,45,40,1b,55,1b,40,21,20,20,1b,50,1b,45,54,1f,4d,53,0e,1b,56,1b,40,54,1b,55,22,20,12,43,40,1b,50,1b,45,21,1f,4e,54,0e,1b,45,22,1b,55,1b,40,30,20,20,58,1f,4f,56,0e,1b,55,1b,40,54,1b,50,1b,45,21,09,09,1b,47,40,1f,50,4f,0e,4a,49,49,42,4a,49,42,4a,49,49,42,4a,21,1f,51,4f,0e,2a,12,4a,22,24";
@@ -87,7 +84,6 @@ void displayDemarrage() {
 
 
 JSONVar retrieveDatasMAJ(String phpFile) {
-    Serial.println(__func__);
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
@@ -112,7 +108,6 @@ JSONVar retrieveDatasMAJ(String phpFile) {
   return false;
 }
 boolean checkConnexion() {
-    Serial.println(__func__);
 
   if (JSON.typeof(myConfig) == "undefined") {
     return false;
@@ -130,7 +125,6 @@ boolean checkConnexion() {
     while (WiFi.status() != WL_CONNECTED) {
       //WiFi.begin(ssid, password);
       delay(1000);
-      Serial.println("Wifi status "+WiFi.status());
       if (cnt == 15) {
         switch (WiFi.status()) {
           case 1:
