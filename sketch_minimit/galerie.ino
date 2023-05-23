@@ -67,12 +67,18 @@ void loopGalerie() {
               const char* pseudo = (const char*)myConfig["input"][2];
               if(pseudo==""){
                 ligneZeroSafe("vous n'avez pas de pseudo !");
-                return;
+                break;
+              }
+              int nbimagesPerso = myObject["datasperso"]["root"].length();
+              if(nbimagesPerso==0){
+                ligneZeroSafe("pas d'images ! tapez Guide ");
+                break;
               }
               myObject["galerieMode"] = "PERSO";
             }
             if (userInput == "1" || userInput == "2") {
-              Serial.println("ici");
+              ligneZeroSafe("");
+              myObject["current"]= 0;
               currentEcran = "GALERIE";
               nextUpdate = 0;
               userInput = "";
@@ -125,7 +131,6 @@ void loopGalerie() {
   }
 
   void retrieveDatasGALERIEPerso() {
-    Serial.println("retrieveDatasGaleriePerso");
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
       const char* pseudo = (const char*)myConfig["input"][2];
@@ -136,9 +141,6 @@ void loopGalerie() {
       if (httpResponseCode > 0) {
         String payload = http.getString();
         JSONVar myJSONObject = JSON.parse(payload);
-        Serial.println("");
-        Serial.print(payload);
-        Serial.println("");
         myObject["datasperso"] = myJSONObject;
         if (JSON.typeof(myJSONObject) == "undefined") {
           Serial.println("Parsing input failed!");
@@ -152,11 +154,13 @@ void loopGalerie() {
     }
   }
   void afficheDatasGALERIE() {
-    Serial.println("affcicheDatasGalerie");
+    Serial.println("afficheDatasGalerie");
     minitel.noCursor();
     int currentImage = myObject["current"];
     myObject["current"] = currentImage;
     String galerieMode = (const char*)myObject["galerieMode"];
+    Serial.println("galerieMode");
+    Serial.println(galerieMode);
     String myImage;
     if(galerieMode == "PERSO")
     {
