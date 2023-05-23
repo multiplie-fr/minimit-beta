@@ -119,7 +119,6 @@ void loopConfig() {
           JSONVar myconfig = {};
           File file = SPIFFS.open(confFile, "w");
           if (!file) {
-            // File not found | le fichier de test n'existe pas
             Serial.println("Failed to write config file");
             return;
           } else {
@@ -127,11 +126,13 @@ void loopConfig() {
             myconfig["input"] = input;
             myconfig["pseudo"] = (const char*)myObject["input"][2];
             file.print(myconfig);
-            myConfig = myConfig;
+            //myConfig = myConfig; OH OH
+            //myConfig = myconfig;
+
             file.close();
 
-            const char* ssid = (const char*)myObject["input"][0];
-            const char* password = (const char*)myObject["input"][1];
+            //const char* ssid = (const char*)myObject["input"][0];
+            //const char* password = (const char*)myObject["input"][1];
             /*if (String(ssid) == "" || String(password) == "") {
               delay(1000);
               Serial.println("sortie de loopConfig sans Wifi parameters");
@@ -224,9 +225,9 @@ void pseudoOK() {
   effacementEcran(18,19, CARACTERE_BLEU, FOND_BLEU);
   minitel.moveCursorXY(2, 19);
   minitel.attributs(CARACTERE_BLANC);
-  minitel.print("Pseudo OK ! ");
+  minitel.print("Votre pseudo est unique ! ");
   minitel.attributs(INVERSION_FOND);
-  minitel.print(" SOMMAIRE ");
+  minitel.print(" Tapez sur SOMMAIRE pour continuer");
 }
 void pseudoKO() {
   effacementEcran(18,19, CARACTERE_BLEU, FOND_BLEU);
@@ -266,7 +267,6 @@ void retrieveDatasPseudo(String pseudo, String passwd, String oldpseudo) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath = serverName + String("users/login_from_minimit.php?pseudo=") + pseudo + String("&password=" + passwd) + String("&oldpseudo=" + oldpseudo);
-    // Your Domain name with URL path or IP address with path
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
@@ -280,6 +280,6 @@ void retrieveDatasPseudo(String pseudo, String passwd, String oldpseudo) {
     // Free resources
     http.end();
   } else {
-    Serial.println("WiFi Disconnected");
+    Serial.println("WiFi Disconnected : can't retrieveDatasPseudo");
   }
 }

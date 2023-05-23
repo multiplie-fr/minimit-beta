@@ -255,7 +255,8 @@ int launchService(String minimit_service) {
 
  if (minimit_service == "GUIDE") {
     setupGuide();
-	  loopGuide();
+    minimit_service = loopGuide();
+    launchService(minimit_service);
     return 0;
   }
 
