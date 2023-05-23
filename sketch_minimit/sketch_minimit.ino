@@ -240,7 +240,15 @@ int launchService(String minimit_service) {
 	  loopPPP();
     return 0;
   }
-
+if (minimit_service == "TAROT" || minimit_service =="13" ) {
+    if(!isConnected)
+    {
+      return 1;
+    }
+    setupTarots();
+	  loopTarots();
+    return 0;
+  }
   if (minimit_service == "CONFIG") {
     setupConfig();
 	  loopConfig();
@@ -255,8 +263,7 @@ int launchService(String minimit_service) {
 
  if (minimit_service == "GUIDE") {
     setupGuide();
-    minimit_service = loopGuide();
-    launchService(minimit_service);
+    loopGuide();
     return 0;
   }
 

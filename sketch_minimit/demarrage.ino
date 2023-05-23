@@ -51,16 +51,14 @@ void displayDemarrage() {
   minitel.print(minimitVersion);  
   minitel.echo(false);
   if (isConfig) {
-    ligneZeroSafe("Ce Minitel est-il connecté au Wifi ?");
     isConnected = checkConnexion();
     if(isConnected)
     {
-      ligneZeroSafe("Oui !");
       Serial.println("Connexion WiFi OK");
-      delay(2000);
-      ligneZeroSafe("");
 
       //check last minimit version pour OTA
+      ligneZeroSafe("Recherche des mises à jour ...");
+
       JSONVar datasMaj = retrieveDatasMAJ("ota/getjson.php?currentversion="+minimitVersion);
       boolean flag_ota = datasMaj["params"]["update"];
       String lastVersion = (const char*)datasMaj["params"]["version"];
@@ -71,20 +69,18 @@ void displayDemarrage() {
         setLastVersionOTA(lastVersion);
         launchService("OTA");
       }
+      ligneZeroSafe("");
+
   
     }
     else
     {
       Serial.println("Wifi not connected");
-      ligneZeroSafe("Ah non !");
     }    
 
-    delay(3000);
-    ligneZeroSafe(" ");
     minitel.echo(true);
     return;
   } else {
-    delay(1000);
     launchService("CONFIG");
   }
 }

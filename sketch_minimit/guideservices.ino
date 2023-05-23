@@ -1,8 +1,24 @@
 // GUIDE DES SERVICES
 
 
-String LocalService[]={"ANNUAIRE", "NABAZTAG", "LEMONDE","TAROT", "PPP"};
-int NB_LOCAL_SERVICES = 5;
+String LocalService[]={"ANNUAIRE",
+  "ASTRO",
+  "COUPLESPARFAITS",
+  "ELIZA",
+  "FORTUNE",
+  "GALERIE",
+  "LEMONDE",
+  "METEO",
+  "NABAZTAG",
+  "PENDU",
+  "PONG",
+  "PPP",
+  "TAROT"};
+
+int NB_LOCAL_SERVICES = 13;
+
+
+
 
 // SETUP du service
 void setupGuide() {
@@ -12,7 +28,7 @@ void setupGuide() {
 
 
 // LOOP du service
-String loopGuide() {
+void loopGuide() {
   Serial.println("loop Guide");
   champVide(11, 24, 22);
   while (1) {
@@ -26,7 +42,7 @@ String loopGuide() {
       // SI CONNEXION FIN on sort de la loop, on revient à la loop principale
       case CONNEXION_FIN:
         Serial.println("CONNEXION_FIN");
-        return "";
+        return;
         break;
 
         // SI ENVOI on affiche le service
@@ -35,7 +51,15 @@ String loopGuide() {
           Serial.println("ENVOI depuis guide");
           Serial.println(userInput);
           int index_s = userInput.toInt();
-          return LocalService[index_s];
+          if (index_s < NB_LOCAL_SERVICES) {
+            launchService(LocalService[index_s-1]);
+            return;
+            } else { // WS
+              Serial.println("WS service");
+              connectToWS(index_s-NB_LOCAL_SERVICES-1);
+              loopWS();
+              return;
+            }
 
         }
 
@@ -59,13 +83,19 @@ void displayGuideMire() {
   checkScreen(vdt, 0, 0);
   minitel.attributs(CARACTERE_BLANC);
 
+  // local services
   for (int i = 0; i<NB_LOCAL_SERVICES; i++){
 
-      minitel.newXY(3, 11+i);
-      index = String(i);
-      minitel.print(index+1);
+      if (i<12) minitel.newXY(3, 11+i);
+      else minitel.newXY(24, 11+i-12);
+      index = String(i+1);
+      minitel.print(index);
       minitel.print(" ");
       minitel.print(LocalService[i]);
   }
+
+  // Ws services
+  setupWS(24,13, NB_LOCAL_SERVICES+1);
+
   minitel.cursor();
 }
