@@ -234,7 +234,7 @@ void pseudoOK() {
   effacementEcran(18,19, CARACTERE_BLEU, FOND_BLEU);
   minitel.moveCursorXY(2, 19);
   minitel.attributs(CARACTERE_BLANC);
-  minitel.print("Votre pseudo est unique ! ");
+  minitel.print("Très bon pseudo. ");
   minitel.attributs(INVERSION_FOND);
   minitel.print(" Tapez sur SOMMAIRE pour continuer");
 }

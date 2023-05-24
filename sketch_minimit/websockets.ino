@@ -1,7 +1,7 @@
 WebSocketsClient webSocket;
 
 void setupWS(int x, int y, int first_ws_index) {
-  wifiConnect();
+  if (!checkConnexion()) return;
   retrieveDatasWS();
   afficheListeWS(x,y, first_ws_index);
   minitel.cursor();
@@ -29,6 +29,9 @@ void retrieveDatasWS() {
   }
 }
 void afficheListeWS(int first_x, int first_y, int first_ws_index){
+  
+  if (WiFi.status() != WL_CONNECTED) return;
+  
   Serial.println("afficheListeWS");
   Serial.println(myObject);
   JSONVar entries = myObject["entries"];

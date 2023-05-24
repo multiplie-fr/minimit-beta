@@ -52,22 +52,21 @@ void wifiConnect() {
   JSONVar config = myConfig["input"];
   const char* ssid = (const char*)config[0];
   const char* password = (const char*)config[1];
-
-  // HACK
-
-  // const char* ssid = "Dogtown";
-  // const char* password = "west100-;";
-  // const char* ssid = "Livebox-Xine";
-  // const char* password = "malakoff";
-
   WiFi.begin(ssid, password);
+  int counter = 0;
   while (WiFi.status() != WL_CONNECTED) {
     WiFi.begin(ssid, password);
     delay(2000);
+    counter ++;
+    if (counter > 10) {
+        Serial.print("Wifi timeout de connection");
+      return;
+    }
   }
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());
 }
+
 String getRemoteVDT(String vdtFile, int offsetY, int offsetX) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
