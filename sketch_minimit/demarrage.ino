@@ -125,8 +125,10 @@ String minimitVersion;
 }
 
 boolean checkConnexion() {
+  Serial.println("checkConnexion");
 
   if (JSON.typeof(myConfig) == "undefined") {
+    Serial.println("undefined");
     return false;
   } else {
     JSONVar config = myConfig["input"];

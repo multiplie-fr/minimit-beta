@@ -51,7 +51,7 @@ void loopGuide() {
           Serial.println("ENVOI depuis guide");
           Serial.println(userInput);
           int index_s = userInput.toInt();
-          if (index_s < NB_LOCAL_SERVICES) {
+          if (index_s < NB_LOCAL_SERVICES+1) {
             launchService(LocalService[index_s-1]);
             return;
             } else { // WS
