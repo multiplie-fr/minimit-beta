@@ -68,6 +68,22 @@ void loopGuide() {
         Serial.println("annulatoin depuis guide");
         champVide(11, 24, 22);
         break;
+
+      case CORRECTION:
+        {
+          Serial.println("correction depuis guide");
+          if (userInputLength > 0) {
+            minitel.moveCursorLeft(1);
+            minitel.print(".");
+            minitel.attributs(CARACTERE_BLANC);
+            minitel.moveCursorLeft(1);
+            userInput = userInput.substring(0, userInput.length() - 1);
+            Serial.println("userInput");
+            Serial.println(userInput);
+            userInputLength--;
+          }
+        }
+        break;
     }
   }
 }
