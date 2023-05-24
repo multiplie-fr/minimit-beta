@@ -12,8 +12,6 @@ void setupCP() {
   myObject["nbcouplesok"] = 0;
   afficheCP();
   minitel.echo(true);
-  Serial.println("setup CP myConfig");
-  Serial.println(myConfig);
 }
 
 
@@ -48,6 +46,14 @@ void loopCP() {
       case ENVOI:
         {
           if (userInputLength >= 2) {
+            //enlever espace
+            userInput.replace(" ", "");
+            userInput.replace("'", "");
+            if(userInput.length()<2)
+            {
+              champVide(16, 24, 2);
+               break;
+            }
             insertCouple(userInput);
             userInput = "";
             userInputLength = 0;
@@ -291,10 +297,9 @@ void insertCouple(String couple) {
   JSONVar oeuvre = myObject["myDatas"]["root"]["oeuvre"];
   JSONVar texteKO = myObject["myDatas"]["root"]["linesko"];
   int nbLines = texteKO.length();
-  //if (nblinesOK == nbLines) {
-    int nbtries = myObject["nbtries"];//HACK
-    
-    if (nbtries == 2) {//HACK
+  if (nblinesOK == nbLines) {
+    // int nbtries = myObject["nbtries"];//HACK
+    // if (nbtries == 2) {//HACK
     CPMessage("Bravo !");
     CPAuthor((const char*)author, (const char*)oeuvre);
     displayNavFin();
