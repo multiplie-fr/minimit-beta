@@ -44,7 +44,7 @@ void loopGalerie() {
           // } else {
           //   currentImage = 0;
           // }
-          myObject["current"] = currentImage;
+          //myObject["current"] = currentImage;
           
         }
       }
