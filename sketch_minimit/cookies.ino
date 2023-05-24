@@ -6,6 +6,7 @@ void setupCookies() {
   minitel.newScreen();
   wifiConnect();
   afficheRemoteVDT("fc_accueil.vdt", 0, 0);
+  FC_retrieveDatas();
   minitel.noCursor();
   minitel.echo(false);
 }
@@ -19,11 +20,10 @@ void loopCookies() {
 
 	  switch (touche) {
 	      case CONNEXION_FIN:
-        minitel.connexion(false);
-		  	return;
+        return;
 	      break;
       case ENVOI:
-        FC_retrieveDatas();
+        affichePhrase();
         break;
 
     }
@@ -31,24 +31,11 @@ void loopCookies() {
 }
 
 // Fortune Cookie stuff
-void FC_retrieveDatas() {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    String serverPath = serverName + String("fortunecookies/getjson.php");
-    Serial.println(serverPath);
-    // Your Domain name with URL path or IP address with path
-    http.begin(serverPath.c_str());
-    int httpResponseCode = http.GET();
-    if (httpResponseCode > 0) {
-      String payload = http.getString();
-      Serial.println(payload);
-     JSONVar myObject = JSON.parse(payload);
-      if (JSON.typeof(myObject) == "undefined") {
-        Serial.println("Parsing input failed!");
-        return;
-      }
-      afficheRemoteVDT("fc_phrase.vdt", 0, 0);
-      JSONVar cookietexte = myObject["texte"];
+void affichePhrase(){
+      afficheRemoteVDT("fortunecookie_phrase.vdt", 0, 0);
+      int current=myObject["current"];
+      JSONVar cookietexte = myObject["phrases"]["phrases"][current];
+      Serial.println(cookietexte);
       int nbLines = cookietexte.length();
       minitel.attributs(CARACTERE_NOIR);
       minitel.attributs(FOND_BLANC);
@@ -59,6 +46,32 @@ void FC_retrieveDatas() {
         minitel.print((const char*)cookietexte[j]);
         posY++;
       }
+    if (current >= (int) myObject["nbPhrases"] - 1) {
+      Serial.println("ici zéro");
+        current = 0;
+      } else {
+        Serial.println("ici ++");
+        current++;
+      }
+      myObject["current"] = current;
+}
+void FC_retrieveDatas() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String serverPath = serverName + String("fortunecookies/getjsonfull.php");
+    // Your Domain name with URL path or IP address with path
+    http.begin(serverPath.c_str());
+    int httpResponseCode = http.GET();
+    if (httpResponseCode > 0) {
+      String payload = http.getString();
+      JSONVar myDatas = JSON.parse(payload);
+      if (JSON.typeof(myDatas) == "undefined") {
+        Serial.println("Parsing input failed!");
+        return;
+      }
+      myObject["phrases"] = myDatas;
+      myObject["current"] = 0;
+      myObject["nbPhrases"] = (int) myObject["phrases"]["phrases"].length();
     }
     // Free resources
     http.end();
