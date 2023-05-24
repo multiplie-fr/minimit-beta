@@ -10,7 +10,7 @@
 // ex : Do_OTA("https://www.antoineschmitt.com/tests/Squikit.ino.bin")
 
 bool Do_OTA(String url, OTA_progress_cb cb) { 
-  Serial.println("OTA Dooing OTA from: " + url);
+  Serial.println("OTA Doing OTA from: " + url);
   // Connect to host
 
   HTTPClient http;
@@ -130,6 +130,5 @@ bool Do_OTA(String url, OTA_progress_cb cb) {
   Serial.println("Update successfully completed. Rebooting.");
   //ESP.restart();
 
-  // never reached
   return true;
 }

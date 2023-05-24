@@ -23,6 +23,7 @@ void displayDemarrage() {
 
   JSONVar config = readConfig();
   myConfig = config;
+  String minimitVersion;
 
   boolean isConfig;
   if (JSON.typeof(myConfig) == "undefined") {
@@ -30,15 +31,9 @@ void displayDemarrage() {
   } else {
     isConfig = 1;
   }
-  String minimitVersion;
-  myOTAConfig = getOTAConfig();
-  if (JSON.typeof(myOTAConfig) == "undefined") {
-    writeOTAConfig("v0");
-    minimitVersion = "v0";
-  } else {
-    minimitVersion = (const char*)myOTAConfig["version"];
-    Serial.println("Current version OTA="+minimitVersion);
-  }
+  
+
+  minimitVersion = get_minimitVersion();
 
   String vdt = "14,0c,1f,46,54,0e,1b,46,40,50,1f,47,53,0e,1b,46,58,1b,56,20,20,1b,40,22,1b,50,1b,46,30,1f,48,51,0e,1b,46,40,1b,56,1b,40,21,20,12,43,1b,45,58,1f,49,51,0e,1b,56,1b,40,21,20,12,42,1b,45,40,1b,55,1b,46,21,1b,40,30,1f,4a,51,0e,1b,56,20,12,42,1b,45,58,1b,55,1b,40,40,1b,50,1b,45,21,4a,1f,4b,51,0e,1b,56,1b,40,30,20,20,1b,55,48,1b,50,20,20,1b,55,25,1b,50,1b,45,30,1f,4c,51,0e,1b,46,22,1b,56,1b,40,30,20,1b,55,4a,1b,50,1b,45,40,1b,55,1b,40,21,20,20,1b,50,1b,45,54,1f,4d,53,0e,1b,56,1b,40,54,1b,55,22,20,12,43,40,1b,50,1b,45,21,1f,4e,54,0e,1b,45,22,1b,55,1b,40,30,20,20,58,1f,4f,56,0e,1b,55,1b,40,54,1b,50,1b,45,21,09,09,1b,47,40,1f,50,4f,0e,4a,49,49,42,4a,49,42,4a,49,49,42,4a,21,1f,51,4f,0e,2a,12,4a,22,24";
   minitel.noCursor();
@@ -52,24 +47,7 @@ void displayDemarrage() {
     if(isConnected)
     {
       Serial.println("Connexion WiFi OK");
-
-      //check last minimit version pour OTA
-      ligneZeroSafe("Recherche des mises à jour ...");
-
-      JSONVar datasMaj = retrieveDatasMAJ("ota/getjson.php?currentversion="+minimitVersion);
-      boolean flag_ota = datasMaj["params"]["update"];
-      String lastVersion = (const char*)datasMaj["params"]["version"];
-      if(flag_ota == true)
-      {
-        //On lance le service OTA
-        ligneZeroSafe("");
-        Serial.println("Launching OTA");
-        setLastVersionOTA(lastVersion);
-        launchService("OTA");
-      }
-      ligneZeroSafe("");
-
-  
+      check_and_launch_OTA(minimitVersion);
     }
     else
     {
@@ -108,6 +86,44 @@ JSONVar retrieveDatasMAJ(String phpFile) {
   }
   return false;
 }
+
+void check_and_launch_OTA(String minimitVersion) {
+
+      ligneZeroSafe("Recherche des mises à jour ...");
+
+      JSONVar datasMaj = retrieveDatasMAJ("ota/getjson.php?currentversion="+minimitVersion);
+      boolean flag_ota = datasMaj["params"]["update"];
+      String lastVersion = (const char*)datasMaj["params"]["version"];
+      if(flag_ota == true)
+      {
+        //On lance le service OTA
+        ligneZeroSafe("");
+        Serial.println("Launching OTA");
+        setLastVersionOTA(lastVersion);
+        setupOTA();
+	      loopOTA();
+      }
+      ligneZeroSafe("");
+
+
+
+}
+
+String get_minimitVersion() {
+
+String minimitVersion;
+  myOTAConfig = getOTAConfig();
+  if (JSON.typeof(myOTAConfig) == "undefined") {
+    writeOTAConfig("v0");
+    minimitVersion = "v0";
+  } else {
+    minimitVersion = (const char*)myOTAConfig["version"];
+    Serial.println("Current version OTA="+minimitVersion);
+  }
+
+  return minimitVersion;
+}
+
 boolean checkConnexion() {
 
   if (JSON.typeof(myConfig) == "undefined") {
@@ -116,15 +132,10 @@ boolean checkConnexion() {
     JSONVar config = myConfig["input"];
     const char* ssid = (const char*)config[0];
     const char* password = (const char*)config[1];
-    //   const char* ssid = "Dogtown";
-    //  const char* password = "west100-;";
-    // const char* ssid = "Livebox-Xine";
-    // const char* password = "malakoff";
     WiFi.disconnect();
     WiFi.begin(ssid, password);
     int cnt = 0;
     while (WiFi.status() != WL_CONNECTED) {
-      //WiFi.begin(ssid, password);
       delay(1000);
       if (cnt == 15) {
         switch (WiFi.status()) {

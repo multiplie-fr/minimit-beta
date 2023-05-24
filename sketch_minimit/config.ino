@@ -212,6 +212,11 @@ void checkWifi() {
   minitel.noCursor();
   isConnected = true;
   delay(1000);
+
+  // CHECK OTA HERE
+  Serial.println("Config : WIFI connecté, OTA ?");
+  check_and_launch_OTA(get_minimitVersion());
+
   //le psuedo
   String pseudo = (const char*)config[2];
   String pseudopassword = (const char*)config[3];
