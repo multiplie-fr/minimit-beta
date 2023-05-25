@@ -13,11 +13,11 @@ void setupLeMonde() {
   myObject["wip"] = false;
 }
 
-// LOOP 
+// LOOP
 void loopLeMonde() {
   while (1) {
     champVide(13, 23, 3);
-  
+
 
     // Input
     wait_for_user_action();
@@ -28,7 +28,7 @@ void loopLeMonde() {
         guideLeMonde();
         break;
       case CONNEXION_FIN:
-      minitel.connexion(false);
+        minitel.connexion(false);
         return;
         break;
       case SUITE:
@@ -220,12 +220,14 @@ void displayBandeau() {
 }
 void displayNavArticle(int previousDisplayMode) {
   if (previousDisplayMode == 1) {
-    minitel.moveCursorXY(28, 23);
-    minitel.print(" ");
-    minitel.repeat(11);
+    minitel.newXY(28, 23);
+    minitel.clearLineFromCursor();
+    delay(10);
     minitel.moveCursorXY(30, 23);
-    minitel.attributs(CARACTERE_MAGENTA);
-    //minitel.print("Revenir au ");
+    minitel.attributs(FOND_NORMAL);
+    minitel.attributs(CARACTERE_BLANC);
+    minitel.attributs(DEBUT_LIGNAGE);
+    minitel.writeByte(0x20);
     minitel.attributs(INVERSION_FOND);
     minitel.print(" SOMMAIRE ");
     minitel.attributs(FOND_NORMAL);
