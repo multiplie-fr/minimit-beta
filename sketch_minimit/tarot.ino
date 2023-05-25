@@ -6,7 +6,8 @@ void setupTarots() {
   wifiConnect();
   currentEcran = "SOMMAIRE";
   myObject["currentCard"] = (int)-1;
-  afficheRemoteVDT("tarots/tarots.vdt", 0, 0);
+  //afficheRemoteVDT("tarots/tarots.vdt", 0, 0);
+  initTarots();
   minitel.noCursor();
   minitel.echo(false);
 }
@@ -106,6 +107,8 @@ void retourneCartes() {
   currentEcran = "RETOURNEES";
   effacementEcran(24,24, CARACTERE_NOIR, FOND_NOIR);
   JSONVar currentArticle = myObject["datas"]["root"]["articles"][0];
+  Serial.println("currentArticle");
+  Serial.println(currentArticle);
   JSONVar numCard = currentArticle["num"];
   int nnn = currentArticle["num"];
   afficheRemoteVDT("tarots/tarot_" + String(nnn) + ".vdt", 3, 1);
