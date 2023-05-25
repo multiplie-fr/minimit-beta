@@ -102,7 +102,8 @@ void loopConfig() {
         break;
       case CORRECTION:
         {
-          int currentLine = myObject["currentLine"];
+         int currentLine = myObject["currentLine"];
+          Serial.println("correctionCOnfig");
           String acorriger = (const char*)myObject["input"][currentLine];
           int nbCaracteres = acorriger.length()+userInput.length();
           if (nbCaracteres > 0) {
@@ -111,8 +112,10 @@ void loopConfig() {
             minitel.print(".");
             minitel.attributs(CARACTERE_BLANC);
             minitel.moveCursorLeft(1);
-            userInput = userInput.substring(0, userInput.length() - 1);
-            myObject["input"][myObject["currentLine"]] = userInput;
+            //userInput = userInput.substring(0, userInput.length() - 1);
+            acorriger = acorriger.substring(0, acorriger.length() - 1);
+            myObject["input"][myObject["currentLine"]] = acorriger;
+            Serial.println(myObject["input"][myObject["currentLine"]]);
           }
         }
         break;
@@ -131,7 +134,7 @@ void loopConfig() {
             myconfig["pseudo"] = (const char*)myObject["input"][2];
             file.print(myconfig);
             //myConfig = myConfig; OH OH
-            //myConfig = myconfig;
+            myConfig = myconfig;
 
             file.close();
 
