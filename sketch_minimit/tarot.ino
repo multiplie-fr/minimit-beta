@@ -20,11 +20,26 @@ void loopTarots() {
 
 	  switch (touche) {
 	      case CONNEXION_FIN:
-        minitel.connexion(false);
-		  	return;
+        return;
 	      break;
-      case ENVOI:
-        FC_retrieveDatas();
+     case SUITE:
+        {
+         Serial.println(currentEcran);
+          if (currentEcran == "SOMMAIRE") {
+            retourneCartes();
+          } else {
+            suiteTarots();
+          }
+        }
+        break;
+      case RETOUR:
+        retourTarots();
+        break;
+      case REPETITION:
+        repetitionTarots();
+        break;
+      case SOMMAIRE:
+        displaySommaireTarots();
         break;
 
     }
