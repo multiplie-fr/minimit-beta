@@ -233,6 +233,18 @@ void joueLettre(String input, boolean refresh) {
   if (indexProposed > -1) {
     return;
   }
+  //ecrit la lettre proposée
+  int offsetX=0;
+  int posY;
+  posY = 8+(proposed.length()/2);
+  if((proposed.length()/2)>7){
+    offsetX = 6;
+    posY-=8;
+  }
+  minitel.newXY(3+offsetX, posY);
+  minitel.attributs(CARACTERE_BLANC);
+  minitel.print(input);
+  
   myObject["proposed"] = proposed + input + ",";
 
   int current = myObject["current"];
