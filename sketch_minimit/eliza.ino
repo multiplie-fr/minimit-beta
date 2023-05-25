@@ -177,7 +177,7 @@ void correctionEliza(int nbLignes) {
     if (userInputLength != 40 * nbLignes) { minitel.moveCursorLeft(1); }
     minitel.attributs(CARACTERE_BLEU);
     minitel.print(".");
-    minitel.attributs(CARACTERE_BLANC);
+    minitel.attributs(CARACTERE_BLEU);
     minitel.moveCursorLeft(1);
     userInput = userInput.substring(0, userInput.length() - 1);
     userInputLength--;
