@@ -62,7 +62,6 @@ void setup() {
 // en fonction de ça elle lance via launchService les différentes services, que ce soit GUIDE ou Astro ...
 
 void loop() {
-  Serial.println("loop");
   champVide(12, 17, 29);
   while (1) {
     wait_for_user_action();
@@ -97,22 +96,19 @@ void loop() {
         break;
       case SOMMAIRE:
         launchService("CONFIG");
-        init_and_displayMire(1);
+        init_and_displayMire(0);
         break;
       case ANNULATION:
         champVide(12, 17, 29);
         break;
       case CORRECTION:
         {
-          Serial.println("correction");
           if (userInputLength > 0) {
             minitel.moveCursorLeft(1);
             minitel.print(".");
             minitel.attributs(CARACTERE_BLANC);
             minitel.moveCursorLeft(1);
             userInput = userInput.substring(0, userInput.length() - 1);
-            Serial.println("userInput");
-            Serial.println(userInput);
             userInputLength--;
           }
         }
