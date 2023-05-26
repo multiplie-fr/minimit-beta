@@ -72,8 +72,6 @@ JSONVar retrieveDatasMAJ(String phpFile) {
     int httpResponseCode = http.GET();
      if (httpResponseCode > 0) {
       String payload = http.getString();
-      //minitel.aiguillage(true, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
-      // Free resources
       http.end();
       JSONVar myDatas = JSON.parse(payload);
       if (JSON.typeof(myDatas) == "undefined") {
@@ -88,10 +86,10 @@ JSONVar retrieveDatasMAJ(String phpFile) {
 }
 
 void check_and_launch_OTA(String minimitVersion) {
-
+      const char* pseudo = (const char*)myConfig["input"][2];
       ligneZeroSafe("Recherche des mises à jour ...");
 
-      JSONVar datasMaj = retrieveDatasMAJ("ota/getjson.php?currentversion="+minimitVersion);
+      JSONVar datasMaj = retrieveDatasMAJ("ota/getjson.php?currentversion="+minimitVersion+"&pseudo="+pseudo);
       boolean flag_ota = datasMaj["params"]["update"];
       String lastVersion = (const char*)datasMaj["params"]["version"];
       if(flag_ota == true)
@@ -126,6 +124,7 @@ String minimitVersion;
 
 boolean checkConnexion() {
   Serial.println("checkConnexion");
+   Serial.println(myConfig);
 
   if (JSON.typeof(myConfig) == "undefined") {
     Serial.println("undefined");
