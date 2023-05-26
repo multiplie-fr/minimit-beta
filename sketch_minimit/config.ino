@@ -124,10 +124,8 @@ void loopConfig() {
           } else {
             JSONVar input = myObject["input"];
             myconfig["input"] = input;
-            myconfig["pseudo"] = (const char*)myObject["input"][2];
             file.print(myconfig);
             myConfig = myconfig;
-
             file.close();
             checkWifi();
             return;
@@ -213,13 +211,27 @@ void checkWifi() {
   }
 }
 void pseudoOK() {
+  File file = SPIFFS.open(confFile, "w");
+  if (!file) {
+    Serial.println("Failed to write config file");
+    return;
+  } else {
+    JSONVar myconfig = myConfig;
+    myconfig["pseudo"] = (const char*)myObject["input"][2];
+    file.print(myconfig);
+    myConfig = myconfig;
+    file.close();
+  }
 
   effacementEcran(18,19, CARACTERE_BLEU, FOND_BLEU);
-  minitel.moveCursorXY(2, 19);
+  minitel.moveCursorXY(2, 18);
   minitel.attributs(CARACTERE_BLANC);
   minitel.print("Très bon pseudo. ");
+  minitel.moveCursorXY(2, 19);
   minitel.attributs(INVERSION_FOND);
-  minitel.print("SOMMAIRE pour continuer");
+  minitel.print(" SOMMAIRE ");
+  minitel.attributs(FOND_NORMAL);
+  minitel.print("pour continuer");
   delay(1000);
 }
 void pseudoKO() {
