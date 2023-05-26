@@ -71,7 +71,7 @@ void loop() {
       case CONNEXION_FIN:
       minitel.connexion(false);
       break;
-      
+
       case ENVOI:
         {
           int isConnexionNeeded = launchService(userInput);
