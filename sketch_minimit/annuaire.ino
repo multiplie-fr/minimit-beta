@@ -17,14 +17,12 @@ void loopAnnuaire() {
 
     // Input
     wait_for_user_action();
-    myObject["input"][myObject["currentLine"]] = userInput;
+    //myObject["input"][myObject["currentLine"]] = userInput;
     // Traitement de l'action utilisateur (maj des variables globales dans wait_for___)
     switch (touche) {
 
       // SI CONNEXION FIN on sort de la loop, on revient à la loop principale
       case CONNEXION_FIN:
-        Serial.println("CONNEXION_FIN");
-        minitel.connexion(false);
         return;
         break;
 
@@ -41,7 +39,8 @@ void loopAnnuaire() {
             }
           } else {
             if (currentLine < 5) {
-              Serial.println(currentLine);
+              myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
+
               currentLine += 1;
               JSONVar nextSaisie = myObject["input"][currentLine];
               userInput = (const char*)nextSaisie;
@@ -55,7 +54,9 @@ void loopAnnuaire() {
           }
         }
         break;
-
+      case GUIDE:
+      Serial.println(myObject["input"]);
+      break;
       case RETOUR:
         {
           int currentLine = myObject["currentLine"];
@@ -67,8 +68,9 @@ void loopAnnuaire() {
               afficheResultats();
             }
           } else {
+            myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
+  
             if (currentLine > 0) {
-              userInput = "";
               currentLine -= 1;
               JSONVar previousSaisie = myObject["input"][currentLine];
               userInput = (const char*)previousSaisie;
@@ -85,9 +87,14 @@ void loopAnnuaire() {
 
       // SI ENVOI
       case ENVOI:
+      {
+        int currentLine = myObject["currentLine"];
+         myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
         retrieveDatasANNUAIRE("annuaire/getjson.php?s=");
         myObject["currentPage"] = (int)0;
-        afficheResultats();
+        afficheResultats();       
+      }
+        
         break;
 
       case ANNULATION:
@@ -96,22 +103,26 @@ void loopAnnuaire() {
         JSONVar coords = myObject["coords"][currentLine];
         myObject["input"][currentLine] = "";
         champVide(myObject["coords"][currentLine][0], myObject["coords"][currentLine][1], myObject["coords"][currentLine][2]);
-        Serial.println(myObject["input"]);
+        //Serial.println(myObject["input"]);
       }
         break;
 
       case CORRECTION:
         {
-          int nbCaracteres = userInput.length();
-          Serial.println(nbCaracteres);
+          int currentLine = myObject["currentLine"];
+          String acorriger = (const char*)myObject["input"][currentLine];
+          delay(10);
+          int nbCaracteres = acorriger.length()+userInput.length();
           if (nbCaracteres > 0) {
             minitel.moveCursorLeft(1);
-            minitel.attributs(CARACTERE_BLEU);
+            minitel.attributs(CARACTERE_BLANC);
             minitel.print(".");
             minitel.attributs(CARACTERE_BLANC);
             minitel.moveCursorLeft(1);
-            userInput = userInput.substring(0, userInput.length() - 1);
-            myObject["input"][myObject["currentLine"]] = userInput;
+            //userInput = userInput.substring(0, userInput.length() - 1);
+            acorriger = acorriger.substring(0, acorriger.length() - 1);
+            delay(10);
+            myObject["input"][myObject["currentLine"]] = acorriger;
           }
         }
         break;
@@ -147,8 +158,6 @@ void retrieveDatasANNUAIRE(String phpFile) {
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
       String payload = http.getString();
-      Serial.println("payload");
-      Serial.println(payload);
       // Free resources
       http.end();
       JSONVar myDatas = JSON.parse(payload);
@@ -166,6 +175,7 @@ void retrieveDatasANNUAIRE(String phpFile) {
       }
     }
     ligneZero(" ");
+    //myObject["myDatas"] = JSONVar {};
   }
 }
 
@@ -220,8 +230,14 @@ void afficheResultats() {
     return;
   }
 
-
   JSONVar coords = myObject["myDatas"]["root"]["coords"];
+  if(coords==null){
+    ligneZeroSafe("Service indisponible");
+    delay(3000);
+    ligneZeroSafe(" ");
+    minitel.cursor();
+    return;    
+  }
   int cl = coords.length();
   if (cl == 0) {
     ligneZeroSafe("Pas de réponse à votre demande");
