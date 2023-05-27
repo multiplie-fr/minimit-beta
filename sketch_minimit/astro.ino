@@ -23,8 +23,6 @@ void loopAstro() {
 
       // SI CONNEXION FIN on sort de la loop, on revient à la loop principale
       case CONNEXION_FIN:
-        Serial.println("CONNEXION_FIN");
-        minitel.connexion(false);
         return;
         break;
 
