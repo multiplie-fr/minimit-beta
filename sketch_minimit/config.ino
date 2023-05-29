@@ -86,6 +86,7 @@ void loopConfig() {
         }
         break;
       case ANNULATION:
+      case CORRECTION:
         {
           int currentLine = myObject["currentLine"];
           JSONVar coords = myObject["coords"][currentLine];
@@ -93,11 +94,11 @@ void loopConfig() {
           champVide(myObject["coords"][currentLine][0], myObject["coords"][currentLine][1], myObject["coords"][currentLine][2]);
         }
         break;
-      case CORRECTION:
+      /*case CORRECTION:
         {
          int currentLine = myObject["currentLine"];
           String acorriger = (const char*)myObject["input"][currentLine];
-          delay(10);
+          delay(100);
           int nbCaracteres = acorriger.length()+userInput.length();
           if (nbCaracteres > 0) {
             minitel.moveCursorLeft(1);
@@ -107,11 +108,11 @@ void loopConfig() {
             minitel.moveCursorLeft(1);
             //userInput = userInput.substring(0, userInput.length() - 1);
             acorriger = acorriger.substring(0, acorriger.length() - 1);
-            delay(10);
+            delay(100);
             myObject["input"][myObject["currentLine"]] = acorriger;
           }
         }
-        break;
+        break;*/
       case ENVOI:
         {
           int currentLine = myObject["currentLine"];
