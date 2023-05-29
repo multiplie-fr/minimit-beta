@@ -557,9 +557,9 @@ static const std::pair <const std::string, const std::vector <std::string>> vRul
 			"Please continue",
 			"Go on",
 			"Do you feel strongly about discussing such things?",
-			"You say #~# ?",
+			"You say  ?",
 		    "Can you elaborate on that ?",
-		    "Do you say #~#) for some special reason ?",
+		    "Do you say that for some special reason ?",
 		    "That's quite interesting."
 				
 				
