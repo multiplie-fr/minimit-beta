@@ -76,7 +76,7 @@ void loop() {
         {
           int isConnexionNeeded = launchService(userInput);
           if (isConnexionNeeded == 1) {
-            ligneZeroSafe("Ce service nécessite malheureusement une connexion à Internet.");
+            ligneZeroSafe("Ce service nécessite une connexion Internet.");
             delay(2000);
             ligneZeroSafe(" ");
             return;
