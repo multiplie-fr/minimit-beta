@@ -140,24 +140,19 @@ void loopConfig() {
 
 }
 void checkWifi() {
-
   minitel.noCursor();
   JSONVar config = myObject["input"];
   const char* ssid = (const char*)config[0];
   const char* password = (const char*)config[1];
-  
-  WiFi.disconnect();
-  WiFi.begin(ssid, password);
   effacementEcran(18,19, CARACTERE_BLEU, FOND_BLEU);
   minitel.newXY(2, 19);
   minitel.print("Connexion à ");
   minitel.print(ssid);
   int cnt = 0;
+  WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    WiFi.begin(ssid, password);
     delay(1000);
     minitel.print(".");
-    Serial.println("Wifi status "+WiFi.status());
     if (cnt == 10) {
       effacementEcran(18, 19, CARACTERE_BLEU, FOND_BLEU);
       minitel.moveCursorXY(2, 19);
