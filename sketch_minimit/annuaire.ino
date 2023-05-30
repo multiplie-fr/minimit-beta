@@ -2,7 +2,7 @@
 
 // SETUP du service
 void setupAnnuaire() {
-  Serial.println("setup Annuaire");
+  currentService="ANNUAIRE";
   initMinitelService();
   wifiConnect();
   initAnnuaire();
@@ -39,7 +39,7 @@ void loopAnnuaire() {
             }
           } else {
             if (currentLine < 5) {
-              myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
+              myObject["input"][currentLine] = (const char*)myObject["input"][currentLine];
 
               currentLine += 1;
               JSONVar nextSaisie = myObject["input"][currentLine];
@@ -68,8 +68,7 @@ void loopAnnuaire() {
               afficheResultats();
             }
           } else {
-            myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
-  
+            myObject["input"][currentLine] = (const char*)myObject["input"][currentLine];
             if (currentLine > 0) {
               currentLine -= 1;
               JSONVar previousSaisie = myObject["input"][currentLine];
@@ -89,7 +88,7 @@ void loopAnnuaire() {
       case ENVOI:
       {
         int currentLine = myObject["currentLine"];
-         myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
+         myObject["input"][currentLine] = (const char*)myObject["input"][currentLine];
         retrieveDatasANNUAIRE("annuaire/getjson.php?s=");
         myObject["currentPage"] = (int)0;
         afficheResultats();       
@@ -112,7 +111,7 @@ void loopAnnuaire() {
           int currentLine = myObject["currentLine"];
           String acorriger = (const char*)myObject["input"][currentLine];
           delay(10);
-          int nbCaracteres = acorriger.length()+userInput.length();
+          int nbCaracteres = acorriger.length();
           if (nbCaracteres > 0) {
             minitel.moveCursorLeft(1);
             minitel.attributs(CARACTERE_BLANC);

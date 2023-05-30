@@ -14,17 +14,11 @@ void wait_for_user_action() {
     if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
       userInput += char(touche);
       userInputLength++;
-      Serial.print("userInput");
-      Serial.println(userInput);
-      if(currentService=="CONFIG")
+       if(currentService=="CONFIG" || currentService=="ANNUAIRE")
       {
-        Serial.println("lonobject de config");
-        Serial.println(myObject["input"][myObject["currentLine"]]);
         JSONVar currentSaisie = myObject["input"][myObject["currentLine"]];
         String stCurrentSaisie = (const char*)currentSaisie;
         myObject["input"][myObject["currentLine"]] = stCurrentSaisie + char(touche);
-        Serial.println("lonobject de config aprs");
-        Serial.println( myObject["input"][myObject["currentLine"]]);
       }
     }
     if ((touche == CONNEXION_FIN) || (touche == SOMMAIRE) || (touche == ANNULATION) || (touche == RETOUR) || (touche == REPETITION) || (touche == GUIDE) || (touche == CORRECTION) || (touche == SUITE) || (touche == ENVOI)) {
