@@ -1,5 +1,5 @@
 void setupConfig() {
-
+  currentService="CONFIG";
   minitel.pageMode();
   JSONVar config = readConfig();
   myObject["currentLine"] = (int)0;
@@ -37,7 +37,7 @@ void configSuite() {
 
   int currentLine = myObject["currentLine"];
   if (currentLine < 3) {
-    myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
+    myObject["input"][currentLine] = (const char*)myObject["input"][currentLine];
     currentLine += 1;
     JSONVar nextSaisie = myObject["input"][currentLine];
     userInput = (const char*)nextSaisie;
@@ -52,7 +52,7 @@ void configSuite() {
 void configRetour() {
 
   int currentLine = myObject["currentLine"];
-  myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
+  myObject["input"][currentLine] = (const char*)myObject["input"][currentLine];
   if (currentLine > 0) {
     currentLine -= 1;
     JSONVar previousSaisie = myObject["input"][currentLine];
@@ -86,7 +86,6 @@ void loopConfig() {
         }
         break;
       case ANNULATION:
-      case CORRECTION:
         {
           int currentLine = myObject["currentLine"];
           JSONVar coords = myObject["coords"][currentLine];
@@ -94,12 +93,12 @@ void loopConfig() {
           champVide(myObject["coords"][currentLine][0], myObject["coords"][currentLine][1], myObject["coords"][currentLine][2]);
         }
         break;
-      /*case CORRECTION:
+      case CORRECTION:
         {
          int currentLine = myObject["currentLine"];
           String acorriger = (const char*)myObject["input"][currentLine];
           delay(100);
-          int nbCaracteres = acorriger.length()+userInput.length();
+          int nbCaracteres = acorriger.length();
           if (nbCaracteres > 0) {
             minitel.moveCursorLeft(1);
             minitel.attributs(saisieColor);
@@ -108,15 +107,18 @@ void loopConfig() {
             minitel.moveCursorLeft(1);
             //userInput = userInput.substring(0, userInput.length() - 1);
             acorriger = acorriger.substring(0, acorriger.length() - 1);
+            Serial.println("corrigé");
+            Serial.println(acorriger);
             delay(100);
             myObject["input"][myObject["currentLine"]] = acorriger;
+            //lasttouche=CORRECTION;
           }
         }
-        break;*/
+        break;
       case ENVOI:
         {
           int currentLine = myObject["currentLine"];
-          myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
+          //myObject["input"][currentLine] = (const char*)myObject["input"][currentLine]+userInput;
           JSONVar myconfig = {};
           File file = SPIFFS.open(confFile, "w");
           if (!file) {

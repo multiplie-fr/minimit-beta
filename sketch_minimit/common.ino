@@ -1,19 +1,31 @@
 // fonction à mettre dans common
 void wait_for_user_action() {
-
-  userInput = "";
+  if (lasttouche != CORRECTION){
+      userInput = "";
+}
   while (1) {
     if (currentEcran == "GALERIE") {
       loopVDT();
     }
-
     touche = minitel.getKeyCode();
-
-
+    lasttouche=touche;
+      
     // saisie de la commande
     if ((touche != 0) && (touche != CONNEXION_FIN) && (touche != SOMMAIRE) && (touche != ANNULATION) && (touche != RETOUR) && (touche != REPETITION) && (touche != GUIDE) && (touche != CORRECTION) && (touche != SUITE) && (touche != ENVOI)) {
       userInput += char(touche);
       userInputLength++;
+      Serial.print("userInput");
+      Serial.println(userInput);
+      if(currentService=="CONFIG")
+      {
+        Serial.println("lonobject de config");
+        Serial.println(myObject["input"][myObject["currentLine"]]);
+        JSONVar currentSaisie = myObject["input"][myObject["currentLine"]];
+        String stCurrentSaisie = (const char*)currentSaisie;
+        myObject["input"][myObject["currentLine"]] = stCurrentSaisie + char(touche);
+        Serial.println("lonobject de config aprs");
+        Serial.println( myObject["input"][myObject["currentLine"]]);
+      }
     }
     if ((touche == CONNEXION_FIN) || (touche == SOMMAIRE) || (touche == ANNULATION) || (touche == RETOUR) || (touche == REPETITION) || (touche == GUIDE) || (touche == CORRECTION) || (touche == SUITE) || (touche == ENVOI)) {
       return;
@@ -84,6 +96,8 @@ void afficheRemoteVDT(String vdtFile, int offsetY, int offsetX) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath = serverName + String("vdt2.php?f=") + vdtFile;
+    Serial.println("afficheRemoteVDT");
+    Serial.println(serverPath);
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
