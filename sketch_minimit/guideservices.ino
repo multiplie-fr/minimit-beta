@@ -51,6 +51,20 @@ void loopGuide() {
           Serial.println("ENVOI depuis guide");
           Serial.println(userInput);
           int index_s = userInput.toInt();
+          int nbWSServices = 0;
+          if (WiFi.status() == WL_CONNECTED){
+            JSONVar entries = myObject["entries"];
+            nbWSServices = entries.length(); 
+          }
+          
+
+          if(index_s>NB_LOCAL_SERVICES+nbWSServices){
+            champVide(11, 24, 22);
+            break;
+            return;
+          }
+                    
+
           if (index_s < NB_LOCAL_SERVICES+1) {
             launchService(LocalService[index_s-1]);
             return;
@@ -58,6 +72,7 @@ void loopGuide() {
               Serial.println("WS service");
               connectToWS(index_s-NB_LOCAL_SERVICES-1);
               loopWS();
+              init_and_displayMire(1);
               return;
             }
 
