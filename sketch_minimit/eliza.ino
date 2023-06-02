@@ -29,7 +29,6 @@ void loopEliza() {
 
       // SI CONNEXION FIN on sort de la loop, on revient à la loop principale
       case CONNEXION_FIN:
-        Serial.println("CONNEXION_FIN");
         return;
         break;
 
@@ -41,11 +40,8 @@ void loopEliza() {
         userInput.toLowerCase();
         std::string output = eliza_prompt(userInput.c_str());
         minitel.moveCursorXY(1, 4 + lastLine);
-
-        //on affiche la question
+       //on affiche la question
         String strq = String(">ME : ") + String(userInput.c_str());
-        Serial.println("strq");
-        Serial.println(strq);
         // Length (with one extra character for the null terminator)
         int strq_len = strq.length() + 1;
         // Prepare the character array (the buffer)
@@ -70,10 +66,6 @@ void loopEliza() {
         str.toCharArray(char_array, str_len);
         wrap_string(char_array);
         Serial.println(char_array);
-        //effacementEcran(4, 7);
-        //minitel.print(output.c_str());
-        //minitel.print(String(char_array.length()));
-
         Serial.print(char_array);
         char* p = char_array;
         char* stri;
@@ -114,8 +106,6 @@ void displayInterface() {
   currentEcran = "DIALOGUE";
   minitel.moveCursorXY(1, 3);
   minitel.attributs(CARACTERE_MAGENTA);
-  // minitel.writeByte(0x60);
-  // minitel.repeat(32);
   minitel.attributs(INVERSION_FOND);
   minitel.print(" Speak to Eliza ");
   minitel.writeByte(0x60);
@@ -126,7 +116,6 @@ void displayInterface() {
 void champVideEliza(int premiereLigne, int nbLignes) {
   minitel.noCursor();
   minitel.moveCursorXY(1, premiereLigne);
-  //minitel.clearScreenFromCursor();
   for (int j = 0; j < nbLignes; j++) {
     minitel.attributs(CARACTERE_BLEU);
     minitel.print(".");
@@ -139,8 +128,6 @@ void champVideEliza(int premiereLigne, int nbLignes) {
   displayInterface();
   minitel.moveCursorXY(1, premiereLigne);
   minitel.cursor();
-  Serial.print("champvideEliza");
-
 }
 void wrap_string(char* str) {
   const int wrap_len = 40;  // la longueur de la ligne de wrapper
@@ -155,7 +142,6 @@ void wrap_string(char* str) {
     for (j = i + wrap_len; j > i; j--) {
       if (isspace(str[j])) {
         space_pos = j;
-        Serial.println(str);
         break;
       }
     }
@@ -174,9 +160,9 @@ void wrap_string(char* str) {
 void correctionEliza(int nbLignes) {
   if ((userInputLength > 0) && (userInputLength <= 40 * nbLignes)) {
     if (userInputLength != 40 * nbLignes) { minitel.moveCursorLeft(1); }
-    minitel.attributs(CARACTERE_BLEU);
+    minitel.attributs(CARACTERE_MAGENTA);
     minitel.print(".");
-    minitel.attributs(CARACTERE_BLEU);
+    minitel.attributs(CARACTERE_MAGENTA);
     minitel.moveCursorLeft(1);
     userInput = userInput.substring(0, userInput.length() - 1);
     userInputLength--;
