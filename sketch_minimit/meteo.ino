@@ -12,8 +12,8 @@ void setupMeteo() {
 // LOOP du service
 void loopMeteo() {
   Serial.println("loop MEteo");
-  while (1) {
   champVide(28, 3, 5);
+  while (1) {
       
     // Input
     wait_for_user_action();
@@ -46,13 +46,11 @@ void loopMeteo() {
             minitel.moveCursorLeft(1);
             userInput = userInput.substring(0, userInput.length() - 1);
             userInputLength--;
-            Serial.println(userInput);
-          }
+         }
         }
         break;
 
       case ANNULATION:
-        Serial.println("ANNULATION");
         champVide(28, 3, 5);
         break;
     
@@ -82,21 +80,14 @@ void loopMeteo() {
 
 // Fonctions d'affichage et de traitement liées au service
 void retrieveDatasMETEO() {
-  Serial.print(userInput);
+  JSONVar badreturn = {};
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath = serverName + String("meteo/getjson.php?cp=") + userInput;
-    Serial.println(serverPath);
-    // Your Domain name with URL path or IP address with path
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
       String payload = http.getString();
-      Serial.println("PAYLOADMETEO");
-      Serial.print(payload);
-      Serial.println("");
-      //Serial.println(buf[i], HEX);
-      //afficheVDT({payload}, 130, 2,2);
       myObject = JSON.parse(payload);
       if (JSON.typeof(myObject) == "undefined") {
         Serial.println("Parsing input failed!");
@@ -104,10 +95,18 @@ void retrieveDatasMETEO() {
       }
       afficheDatasMETEO();
     }
+    else
+    {
+      ligneZeroSafe("Serveur indisponible");
+      delay(3000);
+      ligneZeroSafe(" ");
+      champVide(28, 3, 5);
+      return;
+    }
     // Free resources
     http.end();
   } else {
-    Serial.println("WiFi Disconnected");
+    //champVide(28, 3, 5);
   }
 }
 //stuff meteo
@@ -127,6 +126,20 @@ void afficheDatasMETEO() {
   effacementEcran(11, 20, CARACTERE_NOIR, FOND_NOIR);
   afficheRemoteVDT("meteo_effacement.vdt", 0, 0);
   minitel.textMode();
+
+  String message = (const char*)myObject["root"]["message"];
+  Serial.println("message");
+  Serial.println(message);
+
+  if(message!="OK")
+  {
+    ligneZeroSafe(message);
+    delay(3000);
+    ligneZeroSafe(" ");
+    champVide(28, 3, 5);
+    return;
+  }
+
   JSONVar forecast = myObject["root"]["forecast"];
   JSONVar station = myObject["root"]["station"];
   JSONVar currentweather = forecast[0];
@@ -168,13 +181,13 @@ void afficheDatasMETEO() {
   String modeprecipitations = (const char*)precipitations["mode"];
   String valuePrecipations = "";
   if (modeprecipitations == "no") {
-    //valuePrecipations = "0";
+    valuePrecipations = "0mm";
   } else {
-    // valuePrecipations = precipitations["value"];
+    valuePrecipations = precipitations["value"];
     
   }
-  //minitel.print(valuePrecipations);
-  minitel.print("0mm");
+  minitel.print(valuePrecipations);
+  //minitel.print("0mm");
   minitel.moveCursorXY(12, 9);
   minitel.attributs(CARACTERE_CYAN);
   minitel.print("Vent");
@@ -234,6 +247,7 @@ void afficheDatasMETEO() {
   minitel.print(" max ");
   minitel.attributs(CARACTERE_BLANC);
   minitel.print((const char*)oldMeteo["max"]);
+  champVide(28, 3, 5);
 }
 void effacementEcranMeteo(int y1, int y2) {
   minitel.noCursor();
