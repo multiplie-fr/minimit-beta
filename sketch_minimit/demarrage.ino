@@ -63,7 +63,8 @@ void displayDemarrage() {
 
 
 JSONVar retrieveDatasMAJ(String phpFile) {
-
+  JSONVar badreturn = {};
+  
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath;
@@ -75,22 +76,36 @@ JSONVar retrieveDatasMAJ(String phpFile) {
       http.end();
       JSONVar myDatas = JSON.parse(payload);
       if (JSON.typeof(myDatas) == "undefined") {
-        return false;
+        return badreturn;
       } else {
         return myDatas;
       }
       
     }
+    else
+    {
+      return badreturn;
+    }
   }
-  return false;
+  return badreturn;
 }
 
 void check_and_launch_OTA(String minimitVersion) {
       const char* pseudo = (const char*)myConfig["input"][2];
+      Serial.println("check");
       ligneZeroSafe("Recherche des mises à jour ...");
 
       JSONVar datasMaj = retrieveDatasMAJ("ota/getjson.php?currentversion="+minimitVersion+"&pseudo="+pseudo);
-      boolean flag_ota = datasMaj["params"]["update"];
+      boolean flag_ota;
+      if (JSON.typeof_(datasMaj)=="undefined")
+      {
+       flag_ota = datasMaj["params"]["update"];
+        Serial.println("ici");
+      }
+      else
+      {
+        flag_ota = false;
+      }
       String lastVersion = (const char*)datasMaj["params"]["version"];
       if(flag_ota == true)
       {
@@ -133,11 +148,15 @@ boolean checkConnexion() {
     JSONVar config = myConfig["input"];
     const char* ssid = (const char*)config[0];
     const char* password = (const char*)config[1];
+    Serial.println(ssid);
+    Serial.println(password);
     WiFi.disconnect();
     WiFi.begin(ssid, password);
     int cnt = 0;
     while (WiFi.status() != WL_CONNECTED) {
       delay(1000);
+      Serial.println("wifiStatus");
+      Serial.println(WiFi.status());
       if (cnt == 15) {
         switch (WiFi.status()) {
           case 1:
