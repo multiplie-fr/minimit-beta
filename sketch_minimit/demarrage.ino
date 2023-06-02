@@ -99,12 +99,12 @@ void check_and_launch_OTA(String minimitVersion) {
       boolean flag_ota;
       if (JSON.typeof_(datasMaj)=="undefined")
       {
-       flag_ota = datasMaj["params"]["update"];
-        Serial.println("ici");
+        ligneZeroSafe(" ");
+        return;
       }
       else
       {
-        flag_ota = false;
+        flag_ota = datasMaj["params"]["update"];
       }
       String lastVersion = (const char*)datasMaj["params"]["version"];
       if(flag_ota == true)
