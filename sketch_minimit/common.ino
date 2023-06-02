@@ -39,12 +39,12 @@ void initMinitelService() {
 void champVide(int x, int y, int longueurchamp) {
   minitel.textMode();
   minitel.noCursor();
-  minitel.moveCursorXY(x, y);
+  minitel.newXY(x, y);
   minitel.attributs(saisieColor);
   for (int j = 0; j < longueurchamp; j++) {
     minitel.print(".");
   }
-  minitel.moveCursorXY(x, y);
+  minitel.newXY(x, y);
   minitel.cursor();
   minitel.echo(true);
   userInput = "";

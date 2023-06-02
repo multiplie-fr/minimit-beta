@@ -139,7 +139,7 @@ void loopAnnuaire() {
 void retrieveDatasANNUAIRE(String phpFile) {
   //minitel.aiguillage(false, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
   if (WiFi.status() == WL_CONNECTED) {
-    ligneZero("Recherche...");
+    ligneZeroSafe("Recherche...");
     HTTPClient http;
     String serverPath;
     //
@@ -155,6 +155,8 @@ void retrieveDatasANNUAIRE(String phpFile) {
     Serial.println(serverPath);
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
+    Serial.println("httpResponde");
+    Serial.println(httpResponseCode);
     if (httpResponseCode > 0) {
       String payload = http.getString();
       // Free resources
@@ -162,7 +164,6 @@ void retrieveDatasANNUAIRE(String phpFile) {
       JSONVar myDatas = JSON.parse(payload);
       minitel.aiguillage(true, CODE_EMISSION_CLAVIER, CODE_RECEPTION_CLAVIER);
       if (JSON.typeof(myDatas) == "undefined") {
-        Serial.println(payload);
         Serial.println("Parsing input failed!");
         return;
       } else {
@@ -173,8 +174,8 @@ void retrieveDatasANNUAIRE(String phpFile) {
         myObject["nbPages"] = nbPages;
       }
     }
-    ligneZero(" ");
-    //myObject["myDatas"] = JSONVar {};
+    ligneZeroSafe(" ");
+    myObject["myDatas"] = JSONVar {};
   }
 }
 
@@ -216,33 +217,44 @@ void afficheAnnuaire() {
   myObject["currentLine"] = 0;
   minitel.echo(true);
 }
+void repositionneCurseur(){
+    int currentLine = myObject["currentLine"] ;
+    JSONVar currentSaisie = myObject["input"][currentLine];
+    int offsetX = strlen(currentSaisie);
+    JSONVar coords = myObject["coords"][currentLine];
+     int nx = coords[0];
+    int ny = coords[1];
+    minitel.newXY(nx + offsetX, ny);
+    minitel.cursor();  
+}
 void afficheResultats() {
   minitel.noCursor();
 
   JSONVar iscaptcha = myObject["myDatas"]["root"]["captcha"][0];
   String captchastatus = (const char*)iscaptcha;
   if (captchastatus == "YES") {
-    ligneZeroSafe("Service indisponible");
+    ligneZero("Service indisponible");
     delay(3000);
-    ligneZeroSafe(" ");
+    ligneZero(" ");
     minitel.cursor();
     return;
   }
 
   JSONVar coords = myObject["myDatas"]["root"]["coords"];
   if(coords==null){
-    ligneZeroSafe("Service indisponible");
+    ligneZero("Service indisponible");
     delay(3000);
-    ligneZeroSafe(" ");
+    ligneZero(" ");
     minitel.cursor();
     return;    
   }
   int cl = coords.length();
   if (cl == 0) {
+    minitel.noCursor();
     ligneZeroSafe("Pas de réponse à votre demande");
     delay(3000);
     ligneZeroSafe(" ");
-    minitel.cursor();
+    repositionneCurseur();
     return;
   }
   currentEcran = "RESULTATS";
