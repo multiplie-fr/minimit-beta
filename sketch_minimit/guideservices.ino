@@ -1,19 +1,19 @@
 // GUIDE DES SERVICES
 
 
-String LocalService[]={"ANNUAIRE",
-  "ASTRO",
-  "COUPLESPARFAITS",
-  "ELIZA",
-  "FORTUNE",
-  "GALERIE",
-  "LEMONDE",
-  "METEO",
-  "NABAZTAG",
-  "PENDU",
-  "PONG",
-  "PPP",
-  "TAROT"};
+String LocalService[] = { "ANNUAIRE",
+                          "ASTRO",
+                          "COUPLESPARFAITS",
+                          "ELIZA",
+                          "FORTUNE",
+                          "GALERIE",
+                          "LEMONDE",
+                          "METEO",
+                          "NABAZTAG",
+                          "PENDU",
+                          "PONG",
+                          "PPP",
+                          "TAROT" };
 
 int NB_LOCAL_SERVICES = 13;
 
@@ -50,32 +50,46 @@ void loopGuide() {
         {
           Serial.println("ENVOI depuis guide");
           Serial.println(userInput);
-          int index_s = userInput.toInt();
-          int nbWSServices = 0;
-          if (WiFi.status() == WL_CONNECTED){
-            JSONVar entries = myObject["entries"];
-            nbWSServices = entries.length(); 
-          }
-          
 
-          if(index_s>NB_LOCAL_SERVICES+nbWSServices){
-            champVide(11, 24, 22);
-            break;
-            return;
-          }
-                    
 
-          if (index_s < NB_LOCAL_SERVICES+1) {
-            launchService(LocalService[index_s-1]);
-            return;
-            } else { // WS
+          if (isValidNumber(userInput)) {
+            int index_s = userInput.toInt();
+            int nbWSServices = 0;
+            if (WiFi.status() == WL_CONNECTED) {
+              JSONVar entries = myObject["entries"];
+              nbWSServices = entries.length();
+            }
+
+
+            if (index_s > NB_LOCAL_SERVICES + nbWSServices) {
+              champVide(11, 24, 22);
+              break;
+              return;
+            }
+
+
+            if (index_s < NB_LOCAL_SERVICES + 1) {
+              launchService(LocalService[index_s - 1]);
+              return;
+            } else {  // WS
               Serial.println("WS service");
-              connectToWS(index_s-NB_LOCAL_SERVICES-1);
+              connectToWS(index_s - NB_LOCAL_SERVICES - 1);
               loopWS();
               init_and_displayMire(1);
               return;
             }
-
+          } else {
+            if (isIndexByKey((const String*)LocalService, userInput, NB_LOCAL_SERVICES)) {
+              launchService(userInput);
+              return;
+            }
+            else
+            {
+              champVide(11, 24, 22);
+              break;
+              return;
+            }
+          }
         }
 
         break;
@@ -115,18 +129,28 @@ void displayGuideMire() {
   minitel.attributs(CARACTERE_BLANC);
 
   // local services
-  for (int i = 0; i<NB_LOCAL_SERVICES; i++){
+  for (int i = 0; i < NB_LOCAL_SERVICES; i++) {
 
-      if (i<12) minitel.newXY(3, 11+i);
-      else minitel.newXY(24, 11+i-12);
-      index = String(i+1);
-      minitel.print(index);
-      minitel.print(" ");
-      minitel.print(LocalService[i]);
+    if (i < 12) minitel.newXY(3, 11 + i);
+    else minitel.newXY(24, 11 + i - 12);
+    index = String(i + 1);
+    minitel.print(index);
+    minitel.print(" ");
+    minitel.print(LocalService[i]);
   }
 
   // Ws services
-  setupWS(24,13, NB_LOCAL_SERVICES+1);
+  setupWS(24, 13, NB_LOCAL_SERVICES + 1);
 
   minitel.cursor();
+}
+
+int isIndexByKey(const String* myArray, String key, int lenght) {
+  for (uint8_t i = 0; i < lenght; i++) {
+    if (myArray[i] == key) {
+      return true;
+    }
+  }
+
+  return false;
 }
