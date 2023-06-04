@@ -183,8 +183,7 @@ void afficheDatasMETEO() {
   if (modeprecipitations == "no") {
     valuePrecipations = "0mm";
   } else {
-    valuePrecipations = precipitations["value"];
-    
+    valuePrecipations = (const char*)precipitations["value"];
   }
   minitel.print(valuePrecipations);
   //minitel.print("0mm");
