@@ -53,6 +53,7 @@ void loopGuide() {
 
 
           if (isValidNumber(userInput)) {
+            Serial.println("isVAALIDE");
             int index_s = userInput.toInt();
             int nbWSServices = 0;
             if (WiFi.status() == WL_CONNECTED) {
@@ -69,7 +70,24 @@ void loopGuide() {
 
 
             if (index_s < NB_LOCAL_SERVICES + 1) {
-              launchService(LocalService[index_s - 1]);
+              //launchService(LocalService[index_s - 1]);
+              int isConnexionNeeded = launchService(LocalService[index_s - 1]);
+              if (isConnexionNeeded == 1) {
+                ligneZeroSafe("Ce service nécessite une connexion Internet.");
+                delay(2000);
+                ligneZeroSafe(" ");
+                champVide(11, 24, 22);
+                break;
+                return;
+              }
+              if (isConnexionNeeded == 2) {
+                ligneZeroSafe("Ce service nous est inconnu.");
+                delay(2000);
+                ligneZeroSafe(" ");
+                champVide(11, 24, 22);
+                break;
+                return;
+              }
               return;
             } else {  // WS
               Serial.println("WS service");
@@ -79,12 +97,28 @@ void loopGuide() {
               return;
             }
           } else {
+            Serial.println("notvalid");
             if (isIndexByKey((const String*)LocalService, userInput, NB_LOCAL_SERVICES)) {
-              launchService(userInput);
+              int isConnexionNeeded = launchService(userInput);
+              //Serial.println("ici");
+              if (isConnexionNeeded == 1) {
+                ligneZeroSafe("Ce service nécessite une connexion Internet.");
+                delay(2000);
+                ligneZeroSafe(" ");
+                champVide(11, 24, 22);
+                break;
+                return;
+              }
+              if (isConnexionNeeded == 2) {
+                ligneZeroSafe("Ce service nous est inconnu.");
+                delay(2000);
+                ligneZeroSafe(" ");
+                break;
+                champVide(11, 24, 22);
+                return;
+              }
               return;
-            }
-            else
-            {
+            } else {
               champVide(11, 24, 22);
               break;
               return;
@@ -140,8 +174,9 @@ void displayGuideMire() {
   }
 
   // Ws services
-  setupWS(24, 13, NB_LOCAL_SERVICES + 1);
-
+  if (WiFi.status() == WL_CONNECTED) {
+    setupWS(24, 13, NB_LOCAL_SERVICES + 1);
+  }  
   minitel.cursor();
 }
 
