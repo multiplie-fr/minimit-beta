@@ -1,7 +1,7 @@
 WebSocketsClient webSocket;
 
 void setupWS(int x, int y, int first_ws_index) {
-  checkConnexion();
+  //checkConnexion();
   if (WiFi.status() != WL_CONNECTED) return;
   retrieveDatasWS();
   afficheListeWS(x,y, first_ws_index);
