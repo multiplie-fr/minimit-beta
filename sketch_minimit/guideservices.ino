@@ -73,7 +73,7 @@ void loopGuide() {
               //launchService(LocalService[index_s - 1]);
               int isConnexionNeeded = launchService(LocalService[index_s - 1]);
               if (isConnexionNeeded == 1) {
-                ligneZeroSafe("Ce service nécessite une connexion Internet.");
+                ligneZeroSafe("Nécessite une connexion Internet");
                 delay(2000);
                 ligneZeroSafe(" ");
                 champVide(11, 24, 22);
