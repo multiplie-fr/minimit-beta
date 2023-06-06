@@ -97,7 +97,6 @@ void loopGalerie() {
           break;
 
         case ANNULATION:
-          Serial.println("ANNULATION");
           champVide(32, 23, 1);
           break;
 
@@ -123,42 +122,31 @@ void loopGalerie() {
       if (httpResponseCode > 0) {
         String payload = http.getString();
         JSONVar myJSONObject = JSON.parse(payload);
-        Serial.println("");
-        Serial.print(payload);
-        Serial.println("");
         myObject["datas"] = myJSONObject;
         if (JSON.typeof(myObject) == "undefined") {
-          Serial.println("Parsing input failed!");
           return;
         }
       }
       // Free resources
       http.end();
     } else {
-      Serial.println("WiFi Disconnected");
+      
     }
   }
 
   void retrieveDatasGALERIEPerso() {
     if (WiFi.status() == WL_CONNECTED) {
-      Serial.println("retrieveDatasGalerie");
       HTTPClient http;
       const char* pseudo = (const char*)myConfig["input"][2];
       const char* pseudopassword = (const char*)myConfig["input"][3];
-      Serial.println(pseudo);
-      Serial.println(pseudopassword);
       String serverPath = serverName + String("users/get_galerie_from_minimit.php?pseudo=") + String(pseudo) + String("&password=") + String(pseudopassword);
-      Serial.println(serverPath);
       http.begin(serverPath.c_str());
       int httpResponseCode = http.GET();
       if (httpResponseCode > 0) {
         String payload = http.getString();
         JSONVar myJSONObject = JSON.parse(payload);
-        Serial.println(myJSONObject);
         myObject["datasperso"] = myJSONObject;
-        Serial.println(myObject);
         if (JSON.typeof(myJSONObject) == "undefined") {
-          Serial.println("Parsing input failed!");
           return;
         }
       }
@@ -169,15 +157,12 @@ void loopGalerie() {
     }
   }
   void afficheDatasGALERIE() {
-    Serial.println("afficheDatasGalerie");
     ligneZeroSafe(" ");
     minitel.newScreen();
     minitel.noCursor();
     int currentImage = myObject["current"];
     myObject["current"] = currentImage;
     String galerieMode = (const char*)myObject["galerieMode"];
-    Serial.println("galerieMode");
-    Serial.println(galerieMode);
     String myImage;
     if(galerieMode == "PERSO")
     {
@@ -188,7 +173,6 @@ void loopGalerie() {
     myImage = (const char*)myObject["datas"]["root"][currentImage];
     vdt = getRemoteVDT("galerie/" + myImage, 0, 0);
     }
-    Serial.println(myImage);
     startVdt(vdt, 0, 0);
   }
   void afficheSommaireGalerie() {
