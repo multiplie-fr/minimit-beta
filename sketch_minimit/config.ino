@@ -107,8 +107,6 @@ void loopConfig() {
             minitel.moveCursorLeft(1);
             //userInput = userInput.substring(0, userInput.length() - 1);
             acorriger = acorriger.substring(0, acorriger.length() - 1);
-            Serial.println("corrigé");
-            Serial.println(acorriger);
             delay(100);
             myObject["input"][myObject["currentLine"]] = acorriger;
             //lasttouche=CORRECTION;
@@ -205,7 +203,7 @@ void checkWifi() {
     delay(1000);
     return;
   } else {
-    retrieveDatasPseudo(pseudo, pseudopassword, oldpseudo);
+     retrieveDatasPseudo(pseudo, pseudopassword, oldpseudo);
   }
 }
 void pseudoOK() {
@@ -221,15 +219,15 @@ void pseudoOK() {
     file.close();
   }
 
-  effacementEcran(18,19, CARACTERE_BLEU, FOND_BLEU);
-  minitel.moveCursorXY(2, 18);
-  minitel.attributs(CARACTERE_BLANC);
-  minitel.print("Très bon pseudo. ");
-  minitel.moveCursorXY(2, 19);
-  minitel.attributs(INVERSION_FOND);
-  minitel.print(" SOMMAIRE ");
-  minitel.attributs(FOND_NORMAL);
-  minitel.print("pour continuer");
+  // effacementEcran(18,19, CARACTERE_BLEU, FOND_BLEU);
+  // minitel.moveCursorXY(2, 18);
+  // minitel.attributs(CARACTERE_BLANC);
+  // minitel.print("Très bon pseudo. ");
+  // minitel.moveCursorXY(2, 19);
+  // minitel.attributs(INVERSION_FOND);
+  // minitel.print(" SOMMAIRE ");
+  // minitel.attributs(FOND_NORMAL);
+  // minitel.print("pour continuer");
   delay(1000);
 }
 void pseudoKO() {
@@ -268,11 +266,22 @@ void retrieveDatasPseudo(String pseudo, String passwd, String oldpseudo) {
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    String serverPath = serverName + String("users/login_from_minimit.php?pseudo=") + pseudo + String("&password=" + passwd) + String("&oldpseudo=" + oldpseudo);
+    String serverPath = serverName + String("users/login_from_minimit.php?pseudo=");
+    serverPath +=  pseudo;
+    serverPath +=  String("&password=");
+    serverPath += passwd;
+    serverPath += String("&oldpseudo=");
+    serverPath += oldpseudo;
     http.begin(serverPath.c_str());
+    Serial.println(serverPath);
+
+    //String serverPath = serverName + String("users/login_from_minimit.php?pseudo=") + pseudo + String("&password=" + passwd) + String("&oldpseudo=" + oldpseudo);
+    
     int httpResponseCode = http.GET();
-    if (httpResponseCode > 0) {
+     if (httpResponseCode > 0) {
       String payload = http.getString();
+      Serial.println("payload");
+      Serial.println(payload);
       if (payload == "pwko") {
         pseudoKO();
       } else {
