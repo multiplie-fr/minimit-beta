@@ -69,8 +69,8 @@ void wifiConnect() {
       return;
     }
   }
-  Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
+  // Serial.print("Connected to WiFi network with IP Address: ");
+  // Serial.println(WiFi.localIP());
 }
 
 String getRemoteVDT(String vdtFile, int offsetY, int offsetX) {
@@ -90,8 +90,6 @@ void afficheRemoteVDT(String vdtFile, int offsetY, int offsetX) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String serverPath = serverName + String("vdt2.php?f=") + vdtFile;
-    Serial.println("afficheRemoteVDT");
-    Serial.println(serverPath);
     http.begin(serverPath.c_str());
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
@@ -238,14 +236,10 @@ void effacementEcran(int y1, int y2, int attribut1, int attribut2) {
   for (int i = 0; i <= (y2 - y1); i++) {
     minitel.moveCursorXY(1, (y2 - i));
     minitel.graphicMode();
-    //minitel.writeByte(0x20);
     minitel.graphic(0b111100);
     minitel.repeat(39);
-    //minitel.clearLine();
-  }
-  //minitel.cursor();
-  //minitel.attributs(FOND_NORMAL);
-  minitel.textMode();
+   }
+   minitel.textMode();
 }
 void ligneZero(String message) {
     int mx = minitel.getCursorX();
@@ -262,7 +256,7 @@ void ligneZeroSafe(String message) {
   // int my = minitel.getCursorY();
   minitel.newXY(1, 0);
   minitel.print(" ");
-  minitel.repeat(35);
+  minitel.repeat(39);
   minitel.newXY(1, 0);
   minitel.print(message);
   // minitel.newXY(mx, my);
