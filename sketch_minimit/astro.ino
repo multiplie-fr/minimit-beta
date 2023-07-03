@@ -23,12 +23,12 @@ void loopAstro() {
 
       // SI CONNEXION FIN on sort de la loop, on revient à la loop principale
       case CONNEXION_FIN:
+      case SOMMAIRE:
         return;
         break;
 
       // SI ENVOI on affiche la page du signe
       case ENVOI:
-        Serial.println("ENVOI " + userInput);
         retrieveDatasASTRO();
         afficheDatasASTRO();
         break;
@@ -42,8 +42,21 @@ void loopAstro() {
         break;
 
       case ANNULATION:
-        Serial.println("ANNULATION");
         champVide(22, 24, 3);
+        break;
+
+      case CORRECTION:
+        {
+          int nbCaracteres = userInput.length();
+           if (nbCaracteres > 0) {
+            minitel.moveCursorLeft(1);
+            minitel.print(".");
+            minitel.attributs(CARACTERE_BLANC);
+            minitel.moveCursorLeft(1);
+            userInput = userInput.substring(0, userInput.length() - 1);
+            userInputLength--;
+          }
+        }
         break;
     }
   }
