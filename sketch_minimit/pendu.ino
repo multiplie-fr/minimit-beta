@@ -57,10 +57,19 @@ void loopPendu() {
         break;
       case SOMMAIRE:
         {
-          afficheSommairePendu(false, false);
-          afficheDatasPENDU();
-          userInput = "";
-          userInputLength = 0;
+          if(currentEcran=="SOMMAIRE")
+          {
+            Serial.println("SOMMAIRE");
+            return;
+            break;
+          }
+          else
+          {
+            afficheSommairePendu(false, false);
+            afficheDatasPENDU();
+            userInput = "";
+            userInputLength = 0;
+          }
         }
         break;
     }
