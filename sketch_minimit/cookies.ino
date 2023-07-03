@@ -20,6 +20,7 @@ void loopCookies() {
 
 	  switch (touche) {
 	      case CONNEXION_FIN:
+        case SOMMAIRE:
         return;
 	      break;
       case ENVOI:
