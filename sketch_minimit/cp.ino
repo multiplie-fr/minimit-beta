@@ -75,16 +75,26 @@ void loopCP() {
       case REPETITION:
         {
           afficheCP();
-          Serial.print("repettion");
           userInput = "";
           userInputLength = 0;
         }
         break;
 
       case SOMMAIRE:
+      {
+        if(currentEcran != "FIN")
+        {
+          return;
+          break;
+        }
+        else
+        {
         userInput = "";
         userInputLength = 0;
-        setupCP();
+        setupCP();          
+        }
+      }
+        
     }
   }
 }
@@ -358,7 +368,7 @@ void correctionCP() {
   if (userInputLength > 0) {
     minitel.moveCursorLeft(1);
     minitel.attributs(CARACTERE_BLEU);
-    minitel.print("+");
+    minitel.print(".");
     minitel.attributs(CARACTERE_BLANC);
     minitel.moveCursorLeft(1);
     userInput = userInput.substring(0, userInput.length() - 1);
