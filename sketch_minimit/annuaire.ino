@@ -3,6 +3,7 @@
 // SETUP du service
 void setupAnnuaire() {
   currentService="ANNUAIRE";
+  currentEcran = "RECHERCHE";
   initMinitelService();
   wifiConnect();
   initAnnuaire();
@@ -127,8 +128,17 @@ void loopAnnuaire() {
         break;
 
       case SOMMAIRE:
-        initAnnuaire();
-        afficheAnnuaire();
+        {
+          if (currentEcran == "RECHERCHE"){
+            return;
+            break;            
+          }
+          else {
+            initAnnuaire();
+            afficheAnnuaire();
+          }
+        }
+        
         break;
     }
   }
