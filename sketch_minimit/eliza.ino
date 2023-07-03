@@ -29,6 +29,12 @@ void loopEliza() {
 
       // SI CONNEXION FIN on sort de la loop, on revient à la loop principale
       case CONNEXION_FIN:
+      Serial.println("CF");
+      return;
+      break;
+
+      case SOMMAIRE:
+      Serial.println("SOMMAIRE");
         return;
         break;
 
