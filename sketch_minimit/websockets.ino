@@ -32,17 +32,15 @@ void retrieveDatasWS() {
 void afficheListeWS(int first_x, int first_y, int first_ws_index){
   
   if (WiFi.status() != WL_CONNECTED) return;
-  
-  Serial.println("afficheListeWS");
-  Serial.println(myObject);
   JSONVar entries = myObject["entries"];
   int n = entries.length();
   int posY = first_y;
   for (int i = 0; i<n; i++){
       minitel.newXY(first_x, posY);
+      minitel.attributs(CARACTERE_VERT);
       minitel.print(String(i+first_ws_index));
       minitel.newXY(first_x+3,posY);
-      Serial.println(entries[i]["name"]);
+      minitel.attributs(CARACTERE_VERT);
       minitel.print((const char*)entries[i]["name"]);
       posY ++;
   }
