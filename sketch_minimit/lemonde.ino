@@ -28,7 +28,6 @@ void loopLeMonde() {
         guideLeMonde();
         break;
       case CONNEXION_FIN:
-        minitel.connexion(false);
         return;
         break;
       case SUITE:
@@ -52,8 +51,6 @@ void loopLeMonde() {
         break;
       case RETOUR:
         {
-          Serial.print("retour");
-          Serial.println(myObject["currentPage"]);
           int displayMode = myObject["displayMode"];
           switch (displayMode) {
             case 1:
@@ -76,11 +73,8 @@ void loopLeMonde() {
 
 
       case ENVOI:
-        Serial.println("envoi");
         userInput.toUpperCase();
         if (userInputLength > 0) {
-          Serial.println("choix");
-          Serial.println(userInput);
           if (!isValidNumber(userInput)) {
             if (userInput == "BRE") {
               afficheBRELEMONDE();
@@ -111,10 +105,20 @@ void loopLeMonde() {
         }
         break;
       case SOMMAIRE:
-        Serial.println("sommairelemn");
-        userInput = "";
-        userInputLength = 0;
-        sommaireLEMONDE();
+        {
+          Serial.println("sommairelemn");
+
+          if (currentEcran == "SOMMAIRE") {
+            return;
+            break;
+          }
+
+          else {
+            userInput = "";
+            userInputLength = 0;
+            sommaireLEMONDE();
+          }
+        }
         break;
       case ANNULATION:
         userInput = "";
@@ -123,9 +127,7 @@ void loopLeMonde() {
         break;
       case CORRECTION:
         {
-          Serial.println("correction");
           int nbCaracteres = userInput.length();
-          Serial.print(nbCaracteres);
           if (nbCaracteres > 0) {
             minitel.moveCursorLeft(1);
             minitel.print(".");
@@ -133,7 +135,6 @@ void loopLeMonde() {
             minitel.moveCursorLeft(1);
             userInput = userInput.substring(0, userInput.length() - 1);
             userInputLength--;
-            Serial.println(userInput);
           }
         }
         break;
@@ -143,7 +144,6 @@ void loopLeMonde() {
 
 // VARIOUS LE MONDE
 void initLEMONDE(int currentPage) {
-  Serial.println("initlemonde");
   minitel.newScreen();
   myObject["currentPage"] = currentPage;
   myObject["currentArticle"] = (int)0;
@@ -163,7 +163,6 @@ void resetPagesLEMONDE() {
   myObject["displayMode"] = (int)1;
 }
 void afficheUNELEMONDE(int currentPage) {
-  Serial.println("afficheunelemonde");
   currentEcran = "SOMMAIRE";
   myObject["format"] = "UNE";
   updateBandeauLEMONDE("UNE");
@@ -193,11 +192,8 @@ void repetitionLEMONDE() {
   }
 }
 void sommaireLEMONDE() {
-  Serial.println("SOMMAIRELEMONDE");
   int currentArticle = myObject["currentArticle"];
   int logicalPage = getLogicalPage(currentArticle);
-  Serial.println("logicalPage");
-  Serial.println(logicalPage);
   initLEMONDE(logicalPage);
   afficheUNELEMONDE(logicalPage);
 }
@@ -321,7 +317,6 @@ void retourListe() {
   afficheListe(myObject["currentPage"]);
 }
 void retourArticle() {
-  Serial.println("retourarticle");
   int folioMax = myObject["folioMax"];
   int currentFolio = myObject["currentFolio"];
   if (folioMax > 1 && currentFolio > 0) {
@@ -329,7 +324,6 @@ void retourArticle() {
     myObject["currentFolio"] = currentFolio;
     afficheArticleNextPrevious(-1);
   } else {
-    Serial.print("else");
     int currentPage = myObject["currentPage"];
     int nbPages = myObject["nbPages"];
     if (currentPage == 0) {
@@ -340,7 +334,6 @@ void retourArticle() {
   }
 }
 void suiteArticle() {
-  Serial.println("suitearticle");
   int folioMax = myObject["folioMax"];
   if (folioMax > 1) {
     int currentFolio = myObject["currentFolio"];
@@ -348,13 +341,11 @@ void suiteArticle() {
     myObject["currentFolio"] = currentFolio;
     afficheArticleNextPrevious(1);
   } else {
-    Serial.print("else");
     int currentPage = myObject["currentPage"];
     int nbPages = myObject["nbPages"];
     if (currentPage == nbPages - 1) {
       return;
     }
-    Serial.print("icinextarticle");
     nextArticle();
   }
 }
@@ -481,14 +472,11 @@ void retrieveDatasLEMONDE(String phpFile, int displayMode, int articleItem) {
             break;
         }
       }
-      Serial.println("myObject");
-      Serial.println(myObject);
       ligneZero(" ");
     }
   }
 }
 void afficheArticleNextPrevious(int sens) {
-  Serial.println("nextprevisou");
   effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
   afficheFolio();
   JSONVar myDatas = myObject["myArticle"];
@@ -499,8 +487,6 @@ void afficheArticleNextPrevious(int sens) {
   Serial.println("--article");
   Serial.println(article);
   JSONVar texte = article["texte"];
-  Serial.println("textelenght");
-  Serial.print(texte.length());
   int lastLineArticle = myObject["lastlineArticle"];
   if (lastLineArticle >= texte.length()) {
     if (sens == 1) {
@@ -511,8 +497,6 @@ void afficheArticleNextPrevious(int sens) {
     return;
   }
   int posY = 5;
-  Serial.println("lastLineArticle");
-  Serial.println(lastLineArticle);
   int nbLines = 0;
   int j;
   minitel.attributs(CARACTERE_CYAN);
@@ -545,10 +529,9 @@ void afficheFolio() {
   }
 }
 void afficheArticle(int previousDisplayMode) {
-  Serial.println("affichepage");
+  currentEcran="ARTICLE";
   myObject["currentFolio"] = 0;
   displayNavArticle(previousDisplayMode);
-  Serial.print(myObject["myArticle"]);
   effacementEcran(5, 21, CARACTERE_NOIR, FOND_NOIR);
   minitel.noCursor();
   JSONVar myDatas = myObject["myArticle"];
@@ -635,6 +618,4 @@ void afficheListe(int page) {
     }
   }
   minitel.cursor();
-  Serial.println("mydataspagesoffset");
-  Serial.println(myarrayPagesOffset);
 }
