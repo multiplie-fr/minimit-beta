@@ -23,8 +23,7 @@ void loopMeteo() {
 
       // SI CONNEXION FIN on sort de la loop, on revient à la loop principale
       case CONNEXION_FIN:
-        Serial.println("CONNEXION_FIN");
-         return;
+        return;
         break;
 
       // SI ENVOI on affiche la page du signe
@@ -67,11 +66,10 @@ void loopMeteo() {
         break;
       case SOMMAIRE:
         {
-          userInput = "";
-          userInputLength = 0;
-          afficheInterfaceMeteo();
+          return;
+          break;
           
-        }
+       }
         break;    
     }        
   }
