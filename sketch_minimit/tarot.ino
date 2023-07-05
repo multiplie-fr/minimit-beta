@@ -17,15 +17,14 @@ void loopTarots() {
 
   while (1) {
 
-	  wait_for_user_action();
+    wait_for_user_action();
 
-	  switch (touche) {
-	      case CONNEXION_FIN:
+    switch (touche) {
+      case CONNEXION_FIN:
         return;
-	      break;
-     case SUITE:
+        break;
+      case SUITE:
         {
-         Serial.println(currentEcran);
           if (currentEcran == "SOMMAIRE") {
             retourneCartes();
           } else {
@@ -40,9 +39,15 @@ void loopTarots() {
         repetitionTarots();
         break;
       case SOMMAIRE:
-        displaySommaireTarots();
+        {
+          if (currentEcran == "SOMMAIRE") {
+            return;
+            break;
+          } else {
+            displaySommaireTarots();
+          }
+        }
         break;
-
     }
   }
 }
@@ -105,10 +110,8 @@ void displayNavTarotsRetour() {
 void retourneCartes() {
   minitel.echo(false);
   currentEcran = "RETOURNEES";
-  effacementEcran(24,24, CARACTERE_NOIR, FOND_NOIR);
+  effacementEcran(24, 24, CARACTERE_NOIR, FOND_NOIR);
   JSONVar currentArticle = myObject["datas"]["root"]["articles"][0];
-  Serial.println("currentArticle");
-  Serial.println(currentArticle);
   JSONVar numCard = currentArticle["num"];
   int nnn = currentArticle["num"];
   afficheRemoteVDT("tarots/tarot_" + String(nnn) + ".vdt", 3, 1);
@@ -120,7 +123,7 @@ void retourneCartes() {
   numCard = currentArticle["num"];
   nnn = currentArticle["num"];
   afficheRemoteVDT("tarots/tarot_" + String(nnn) + ".vdt", 3, 27);
-   minitel.newXY(2,24);
+  minitel.newXY(2, 24);
   minitel.attributs(CARACTERE_CYAN);
   minitel.print("Interprétation de votre tirage → ");
   minitel.attributs(INVERSION_FOND);
