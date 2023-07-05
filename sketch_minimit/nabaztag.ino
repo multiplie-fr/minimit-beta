@@ -32,7 +32,7 @@ void loopNabaztag() {
 
       // SI CONNEXION FIN on sort de la loop, on revient à la loop principale
       case CONNEXION_FIN:
-        Serial.println("CONNEXION_FIN");
+      case SOMMAIRE:
         return;
         break;
 
@@ -70,7 +70,6 @@ void loopNabaztag() {
         break;
 
       case ANNULATION:
-        Serial.println("ANNULATION");
         champVide(32, 24, 1);
         break;
     }
